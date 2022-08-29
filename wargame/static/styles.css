@@ -1,0 +1,147 @@
+:root {
+    --card-height: 50px;
+    --card-width: 200px;
+}
+
+body {
+    margin: 0;
+}
+
+#board {
+    height: 100vh;
+    display: flex;
+    flex-direction: column;
+}
+
+#red {
+    --team-color: 0 100% 50%;
+    --top-offset: 20%;
+    --bottom-offset: 10%;
+    flex-grow: 10;
+}
+
+#blue {
+    --team-color: 220 100% 50%;
+    --top-offset: 10%;
+    --bottom-offset: 20%;
+    flex-grow: 10;
+}
+
+.core {
+    position: relative;
+    height: 100%;
+    display: flex;
+    box-sizing: border-box;
+}
+
+#border {
+    flex: 2;
+}
+
+.triangle {
+    height: 100%;
+    background: hsla(var(--team-color) / .5);
+    flex: 1 1 100%;
+}
+
+#red .triangle {
+    clip-path: polygon(50% 100%, 0% 0%, 100% 0%);
+}
+
+#blue .triangle {
+    clip-path: polygon(50% 0%, 0% 100%, 100% 100%);
+}
+
+.card {
+    position: absolute;
+    display: inline-block;
+    width: var(--card-width);
+    height: var(--card-height);
+    border: 2px solid black;
+    border-top-left-radius: 10px;
+    border-top-right-radius: 10px;
+}
+
+.card:nth-of-type(1) {
+    top: 10%;
+    left: var(--top-offset);
+}
+
+.card:nth-of-type(2) {
+    top: 10%;
+    right: var(--top-offset);
+}
+
+.card:nth-of-type(3) {
+    top: calc(50% - var(--card-height) / 2);
+    left: calc(50% - var(--card-width) / 2);
+}
+
+.card:nth-of-type(4) {
+    bottom: 10%;
+    left: var(--bottom-offset);
+}
+
+.card:nth-of-type(5) {
+    bottom: 10%;
+    right: var(--bottom-offset);
+}
+
+.entity-display {
+}
+
+.entity-display img {
+    height: 50px;
+}
+
+.entity-stats {
+    bottom: 0;
+}
+
+.entity-resources, .entity-vitality {
+    width: 50%;
+    box-sizing: border-box;
+}
+
+.entity-resources {
+    float: left;
+    border: 2px solid yellow;
+}
+
+.entity-vitality {
+    float: right;
+    border: 2px solid blue;
+}
+
+.navbar > ul {
+    list-style: none;
+    text-align: center;
+}
+
+.navbar > ul > li {
+    display: inline;
+    padding: 5px;
+}
+
+h1 {
+    text-align: center;
+}
+
+div.registration {
+    display: block;
+    text-align: center;
+    form {
+        display: inline-block;
+        margin-left: auto;
+        margin-right: auto;
+    }
+    input {
+        display: block;
+    }
+}
+
+.flashes {
+    list-style: none;
+    color: red;
+    text-align: center;
+}

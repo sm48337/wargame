@@ -1,0 +1,22 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div id="board">
+    {% for team in context %}
+    <div id="{{ team }}">
+        <div class="core">
+            <div class="triangle">
+                {% for entity in context[team].entities %}
+                <div class="card">
+                    {% with %}
+                        {% set context = entity %}
+                        {% include 'entity.html' %}
+                    {% endwith %}
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+    {% endfor %}
+</div>
+{% endblock %}
