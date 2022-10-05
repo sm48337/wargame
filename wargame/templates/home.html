@@ -1,5 +1,21 @@
 {% extends "base.html" %}
 
 {% block content %}
-Hello
+Hello {{ current_user.username }}!
+
+{% for game in current_user.games_in_progress %}
+    {% if loop.first %}
+        You have these games in progress:
+    {% endif %}
+    {{ game }}
+{% endfor %}
+
+{% for game in current_user.games %}
+    {% if loop.first %}
+        You played these games:
+    {% endif %}
+    {{ game }}
+{% else %}
+    You haven't played any games yet!
+{% endfor %}
 {% endblock %}
