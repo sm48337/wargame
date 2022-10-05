@@ -1,5 +1,5 @@
 from flask import Blueprint, render_template, request, redirect, url_for, flash
-from flask_login import current_user, login_required, login_user
+from flask_login import login_required, login_user, logout_user
 
 from .models import db, User
 
@@ -27,10 +27,8 @@ def login():
 @login_required
 def logout():
     """Logout the current user."""
-    current_user.authenticated = False
-
-    db.session.add(current_user)
-    db.session.commit()
+    logout_user()
+    flash('You have successfully logged out!')
 
     return render_template('login.html')
 

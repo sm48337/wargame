@@ -39,10 +39,7 @@ def create_app():
 @login_manager.user_loader
 def load_user(user_id):
     from .models import User
-    try:
-        return User.query.filter_by(id=user_id).one()
-    except User.DoesNotExist:
-        return None
+    return User.query.filter_by(id=user_id).one_or_none()
 
 
 @login_manager.unauthorized_handler

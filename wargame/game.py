@@ -5,6 +5,7 @@ bp = Blueprint('game', __name__, url_prefix='/game')
 
 
 @bp.route('/')
+@login_required
 def home():
     return render_template('home.html')
 
