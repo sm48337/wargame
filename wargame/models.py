@@ -1,6 +1,10 @@
+from enum import Enum, auto
+from itertools import chain
+
 from flask_login.mixins import UserMixin
-from sqlalchemy import Column, ForeignKey, String, Integer, Boolean, Text
+from sqlalchemy import Column, ForeignKey, String, Integer, Boolean, JSON, Enum as SQLEnum
 from sqlalchemy.orm import relationship
+from sqlalchemy.sql.expression import select
 from .db import db
 
 
@@ -27,25 +31,44 @@ class User(db.Model, UserMixin):
 
     @property
     def games(self):
-        return db.union(
-            Game.query.filter_by(first_player=self),
-            Game.query.filter_by(second_player=self),
-        ).all()
+        user_teams = Team.query.filter(Team.players.any(User.id == self.id))
+        query = db.union(
+            Game.query.filter(Game.first_team.has(user_teams)),
+            Game.query.filter(Game.second_team.has(user_teams)),
+        )
+        return chain.from_iterable(db.session.execute(select(Game).from_statement(query)).all())
 
-    @property
-    def games_in_progress(self):
-        return self.games.filter_by(in_progress=True)
+
+class TeamRoles(Enum):
+    GOVERNMENT = auto()
+    PEOPLE = auto()
+    BUSINESS = auto()
+    INFRASTRUCTURE = auto()
+    MILITARY = auto()
+
+
+class UserRole(db.Model):
+    __tablename__ = 'user_role',
+    user_id = Column(ForeignKey('user.id'), primary_key=True)
+    team_id = Column(ForeignKey('team.id'), primary_key=True)
+    role = Column(SQLEnum(TeamRoles), primary_key=True)
+
+
+class Team(db.Model):
+    __tablename__ = 'team'
+
+    id = Column(Integer, primary_key=True)
+    players = relationship('UserRole', lazy='joined')
 
 
 class Game(db.Model):
     __tablename__ = 'game'
 
     id = Column(Integer, primary_key=True)
-    in_progress = Column(Boolean, default=True)
-    first_player_id = Column(Integer, ForeignKey('user.id'), nullable=False)
-    first_player = relationship('User', foreign_keys=[first_player_id])
-    second_player_id = Column(Integer, ForeignKey('user.id'), nullable=False)
-    second_player = relationship('User', foreign_keys=[second_player_id])
-    board_state = Column(Text)
-    victor_id = Column(Integer, ForeignKey('user.id'))
-    victor = relationship('User', foreign_keys=[victor_id])
+    first_team_id = Column(ForeignKey('team.id'), nullable=False)
+    first_team = relationship('Team', foreign_keys=[first_team_id])
+    second_team_id = Column(ForeignKey('team.id'), nullable=False)
+    second_team = relationship('Team', foreign_keys=[second_team_id])
+    board_state = Column(JSON)
+    victor_id = Column(ForeignKey('team.id'), nullable=True)
+    victor = relationship('Team', foreign_keys=[victor_id])
