@@ -11,7 +11,7 @@ body {
     background-image: url(/static/background.svg);
     background-repeat: no-repeat;
     background-size: cover;
-    height: 200vh;
+    height: 100vh;
     display: flex;
     flex-direction: column;
 }
