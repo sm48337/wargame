@@ -8,7 +8,10 @@ body {
 }
 
 #board {
-    height: 100vh;
+    background-image: url(/static/background.svg);
+    background-repeat: no-repeat;
+    background-size: cover;
+    height: 200vh;
     display: flex;
     flex-direction: column;
 }
@@ -40,16 +43,7 @@ body {
 
 .triangle {
     height: 100%;
-    background: hsla(var(--team-color) / .5);
     flex: 1 1 100%;
-}
-
-#red .triangle {
-    clip-path: polygon(50% 100%, 0% 0%, 100% 0%);
-}
-
-#blue .triangle {
-    clip-path: polygon(50% 0%, 0% 100%, 100% 100%);
 }
 
 .card {
