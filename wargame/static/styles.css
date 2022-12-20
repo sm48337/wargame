@@ -113,12 +113,31 @@ body {
 
 .entity-resources {
     float: left;
+    box-sizing: border-box;
     border: 2px solid yellow;
 }
 
 .entity-vitality {
     float: right;
+    box-sizing: border-box;
     border: 2px solid blue;
+}
+
+.entity-connections {
+    display: none;
+    border: 2px solid black;
+}
+
+.card:hover .entity-connections {
+    display: block;
+}
+
+.transfer-target {
+    border: 2px solid lightgreen;
+}
+
+.attack-target {
+    border: 2px solid red;
 }
 
 .navbar > ul {

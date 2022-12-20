@@ -1,13 +1,37 @@
 {% extends "base.html" %}
 
 {% block content %}
+<script>
+    const addClassToTargetOnHover = (selector, className) => {
+        console.log(selector);
+        const selected = document.querySelectorAll(selector);
+        console.log(selected);
+        selected.forEach(a => {
+            const target = document.querySelector('#' + a.attributes.target.value);
+            console.log(a);
+            a.addEventListener('mouseenter', () => {
+                console.log('triggered');
+                target.classList.add(className);
+            });
+            a.addEventListener('mouseleave', () => {
+                target.classList.remove(className);
+            });
+        });
+    };
+
+    window.onload = () => {
+        addClassToTargetOnHover('.attack', 'attack-target');
+        addClassToTargetOnHover('.transfer', 'transfer-target');
+    };
+
+</script>
 <div id="board">
     {% for team in context %}
     <div id="{{ team }}">
         <div class="core">
             <div class="triangle">
                 {% for entity in context[team].entities %}
-                <div class="card">
+                <div class="card" id={{ entity.id }}>
                     {% with %}
                         {% set context = entity %}
                         {% include 'entity.html' %}

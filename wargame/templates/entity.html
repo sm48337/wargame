@@ -1,12 +1,26 @@
 <div class="entity-display">
     <img src="{{ context.image }}">
-        {{ context.name }}
+    <span class="entity-name">{{ context.name }}</span>
 </div>
 <div class="entity-stats">
     <div class="entity-resources">
-        Resource
+        Resource - 3
     </div>
     <div class="entity-vitality">
-        Vitality
+        Vitality - 4
     </div>
+</div>
+<div class="entity-connections">
+    {% for target in entity.connections %}
+    <div class="transfer" target="{{ target }}">
+        Transfer to {{ target }}:
+        <input type="number" placeholder=0 min=0 max=5></input>
+    </div>
+    {% endfor %}
+    {% for target in entity.attacks %}
+    <div class="attack" target="{{ target }}">
+        Attack {{ target }}:
+        <input type="number" placeholder=0 min=0 max=5></input>
+    </div>
+    {% endfor %}
 </div>
