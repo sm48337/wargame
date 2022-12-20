@@ -21,6 +21,7 @@ body {
     --top-offset: 20%;
     --bottom-offset: 10%;
     flex-grow: 10;
+    border-bottom: 1px dashed black;
 }
 
 #blue {
@@ -28,6 +29,7 @@ body {
     --top-offset: 10%;
     --bottom-offset: 20%;
     flex-grow: 10;
+    border-top: 1px dashed black;
 }
 
 .core {
@@ -76,9 +78,21 @@ body {
     left: var(--bottom-offset);
 }
 
+#red .card:nth-of-type(4) {
+    bottom: 20%;
+}
+
+#red .card:nth-of-type(5) {
+    bottom: 20%;
+}
+
 .card:nth-of-type(5) {
     bottom: 10%;
     right: var(--bottom-offset);
+}
+
+.card div {
+    background: darkgray;
 }
 
 .entity-display {
