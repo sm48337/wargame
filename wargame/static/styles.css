@@ -140,6 +140,14 @@ body {
     border: 2px solid red;
 }
 
+.finish-turn-btn {
+    position: absolute;
+    bottom: 0px;
+    right: 30px;
+    font-size: 2rem;
+    padding-inline: 10px;
+}
+
 .navbar > ul {
     list-style: none;
     text-align: center;

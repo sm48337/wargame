@@ -1,3 +1,6 @@
+from itertools import chain
+from operator import itemgetter
+
 from flask import Blueprint, render_template
 from flask_login import login_required
 
@@ -10,11 +13,9 @@ def home():
     return render_template('home.html')
 
 
-@bp.route('/board')
-@login_required
-def board():
-    context = dict()
-    context['red'] = {
+def get_initial_state():
+    state = dict()
+    state['red'] = {
         'entities': [
             {
                 'id': 'bear',
@@ -66,7 +67,7 @@ def board():
             },
         ]
     }
-    context['blue'] = {
+    state['blue'] = {
         'entities': [
             {
                 'id': 'gchq',
@@ -117,4 +118,17 @@ def board():
             },
         ]
     }
-    return render_template('board.html', context=context)
+    for entity in chain.from_iterable(
+            map(itemgetter('entities'), state.values())
+    ):
+        entity['resource'] = 3
+        entity['vitality'] = 4
+
+    return state
+
+
+@bp.route('/board')
+@login_required
+def board():
+    state = get_initial_state()
+    return render_template('board.html', context=state)
