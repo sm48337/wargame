@@ -15,7 +15,11 @@ def home():
 
 def get_initial_state():
     state = dict()
-    state['red'] = {
+    state['turn'] = 1
+    state['month'] = 'January'
+    state['teams'] = dict()
+
+    state['teams']['red'] = {
         'entities': [
             {
                 'id': 'bear',
@@ -67,7 +71,7 @@ def get_initial_state():
             },
         ]
     }
-    state['blue'] = {
+    state['teams']['blue'] = {
         'entities': [
             {
                 'id': 'gchq',
@@ -119,7 +123,7 @@ def get_initial_state():
         ]
     }
     for entity in chain.from_iterable(
-            map(itemgetter('entities'), state.values())
+            map(itemgetter('entities'), state['teams'].values())
     ):
         entity['resource'] = 3
         entity['vitality'] = 4

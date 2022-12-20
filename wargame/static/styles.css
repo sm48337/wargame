@@ -140,6 +140,16 @@ body {
     border: 2px solid red;
 }
 
+.month {
+    position: absolute;
+    right: 30px;
+    top: 70px;
+    background: lightgray;
+    padding: 5px;
+    border: 2px solid black;
+    border-radius: 5px;
+}
+
 .finish-turn-btn {
     position: absolute;
     bottom: 0px;

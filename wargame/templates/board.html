@@ -26,11 +26,12 @@
 
 </script>
 <form id="board" method="post" action="board">
-    {% for team in context %}
+    <div class="month">{{ context.month }}</div>
+    {% for team in context.teams %}
     <div id="{{ team }}">
         <div class="core">
             <div class="triangle">
-                {% for entity in context[team].entities %}
+                {% for entity in context.teams[team].entities %}
                 <div class="card" id={{ entity.id }}>
                     {% with %}
                         {% set context = entity %}
