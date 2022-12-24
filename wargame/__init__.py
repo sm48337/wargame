@@ -31,7 +31,7 @@ def create_app():
     from .db import db
     db.init_app(app)
     with app.app_context():
-        db.create_all(app=app)
+        db.create_all()
         db.session.commit()
 
     return app
