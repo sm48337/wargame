@@ -1,5 +1,6 @@
 import os
 from http import HTTPStatus
+from secrets import token_hex
 
 from flask import Flask, abort, redirect, url_for, request
 from flask_login import LoginManager, utils
@@ -23,7 +24,7 @@ def create_app():
     app.register_blueprint(auth.bp)
     app.register_blueprint(game.bp)
 
-    app.secret_key = b'bla'
+    app.secret_key = get_or_create_secret_key(os.path.join(basedir, 'secret_key'))
 
     login_manager.init_app(app)
 
@@ -48,3 +49,14 @@ def unauthorized():
         abort(HTTPStatus.UNAUTHORIZED)
     next_param = utils.make_next_param(url_for('auth.login'), request.url)
     return redirect(url_for('auth.login', next=next_param))
+
+
+def get_or_create_secret_key(path):
+    if not os.path.exists(path):
+        secret_key = token_hex(32).encode()
+        with open(path, 'wb') as f:
+            f.write(secret_key)
+    else:
+        with open(path, 'rb') as f:
+            secret_key = f.read()
+    return secret_key
