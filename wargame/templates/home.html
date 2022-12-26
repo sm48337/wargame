@@ -3,19 +3,29 @@
 {% block content %}
 Hello {{ current_user.username }}!
 
-{% for game in current_user.games_in_progress %}
-    {% if loop.first %}
-        You have these games in progress:
-    {% endif %}
-    {{ game }}
-{% endfor %}
-
-{% for game in current_user.games %}
-    {% if loop.first %}
-        You played these games:
-    {% endif %}
-    {{ game }}
+{% if current_user.games %}
+<p>You played these games:</p>
+<table>
+    <tr>
+        <th>Game ID</th>
+        <th>Red player</th>
+        <th>Blue player</th>
+        <th>Winner</th>
+    </tr>
+    {% for game in current_user.games %}
+    <tr>
+        <td>{{ game.id }}</td>
+        <td>{{ game.first_player.username }}</td>
+        <td>{{ game.second_player.username }}</td>
+        {% if game.victor %}
+        <td>{{ game.victor.username }}</td>
+        {% else %}
+        <td><i>Game still in progress</i></td>
+        {% endif %}
+    </tr>
+    {% endfor %}
+</table>
 {% else %}
     You haven't played any games yet!
-{% endfor %}
+{% endif %}
 {% endblock %}
