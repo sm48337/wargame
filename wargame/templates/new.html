@@ -1,0 +1,27 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<form id="game" method="post" action="new">
+    <div>
+        <label for="first_player">First player:</label>
+        <select name="first_player" id="first_player">
+            {% for player in context.players %}
+            <option value="{{ player.id }}">{{ player.username }}</option>
+            {% endfor %}
+        </select>
+    </div>
+    <div>
+        <label for="second_player">Second player:</label>
+        <select name="second_player" id="second_player">
+            {% for player in context.players %}
+            <option value="{{ player.id }}">{{ player.username }}</option>
+            {% endfor %}
+        </select>
+    </div>
+    <div>
+        <input type="submit" value="Create game" class="create-game-btn">
+    </div>
+</form>
+
+{% endblock %}

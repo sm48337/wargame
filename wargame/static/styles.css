@@ -16,6 +16,22 @@ body {
     flex-direction: column;
 }
 
+#game > div {
+    text-align: center;
+    padding: 5px;
+}
+
+table {
+    border: 2px solid;
+    margin: 10px;
+}
+
+th, td {
+    border: 1px solid;
+    padding: 10px;
+    text-align: center;
+}
+
 #red {
     --team-color: 0 100% 50%;
     --top-offset: 20%;
@@ -161,6 +177,7 @@ body {
 .navbar > ul {
     list-style: none;
     text-align: center;
+    padding: 0px;
 }
 
 .navbar > ul > li {

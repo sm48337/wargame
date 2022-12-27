@@ -9,7 +9,7 @@
     <body>
         {% with messages = get_flashed_messages() %}
             {% if messages %}
-                <ul class=flashes>
+                <ul class="flashes">
                     {% for message in messages %}
                         <li>{{ message }}</li>
                     {% endfor %}
@@ -20,7 +20,6 @@
         <div class="navbar">
             <ul>
                 <li><a href="{{ url_for('game.home') }}" class="navbar-item">Home</a></li>
-                <li><a href="{{ url_for('game.board') }}" class="navbar-item">Board</a></li>
                 <li><a href="{{ url_for('auth.logout') }}" class="navbar-item">Logout</a></li>
             </ul>
         </div>

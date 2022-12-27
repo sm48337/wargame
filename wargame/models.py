@@ -27,7 +27,7 @@ class User(db.Model, UserMixin):
 
     @property
     def games(self):
-        return Game.query.filter(or_(Game.first_player == self, Game.second_player == self))
+        return Game.query.filter(or_(Game.first_player == self, Game.second_player == self)).all()
 
 
 class Game(db.Model):

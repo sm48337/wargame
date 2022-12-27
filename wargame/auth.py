@@ -47,4 +47,4 @@ def register():
 
     login_user(new_user)
 
-    return render_template('home.html')
+    return redirect(url_for('game.home'))

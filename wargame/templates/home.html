@@ -11,6 +11,7 @@ Hello {{ current_user.username }}!
         <th>Red player</th>
         <th>Blue player</th>
         <th>Winner</th>
+        <th>Link</th>
     </tr>
     {% for game in current_user.games %}
     <tr>
@@ -22,10 +23,12 @@ Hello {{ current_user.username }}!
         {% else %}
         <td><i>Game still in progress</i></td>
         {% endif %}
+        <td><a href="{{ url_for('game.board', game_id=game.id) }}">Go to game</a></td>
     </tr>
     {% endfor %}
 </table>
 {% else %}
-    You haven't played any games yet!
+<p>You haven't played any games yet!</p>
 {% endif %}
+<p><a href="{{ url_for('game.new') }}">Click here</a> to start a new game.</p>
 {% endblock %}
