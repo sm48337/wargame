@@ -1,34 +1,36 @@
 {% extends "base.html" %}
 
 {% block content %}
-Hello {{ current_user.username }}!
+<div id="home">
+    Hello {{ current_user.username }}!
 
-{% if current_user.games %}
-<p>You played these games:</p>
-<table>
-    <tr>
-        <th>Game ID</th>
-        <th>Red player</th>
-        <th>Blue player</th>
-        <th>Winner</th>
-        <th>Link</th>
-    </tr>
-    {% for game in current_user.games %}
-    <tr>
-        <td>{{ game.id }}</td>
-        <td>{{ game.first_player.username }}</td>
-        <td>{{ game.second_player.username }}</td>
-        {% if game.victor %}
-        <td>{{ game.victor.username }}</td>
-        {% else %}
-        <td><i>Game still in progress</i></td>
-        {% endif %}
-        <td><a href="{{ url_for('game.board', game_id=game.id) }}">Go to game</a></td>
-    </tr>
-    {% endfor %}
-</table>
-{% else %}
-<p>You haven't played any games yet!</p>
-{% endif %}
-<p><a href="{{ url_for('game.new') }}">Click here</a> to start a new game.</p>
+    {% if current_user.games %}
+    <p>You played these games:</p>
+    <table>
+        <tr>
+            <th>Game ID</th>
+            <th>Red player</th>
+            <th>Blue player</th>
+            <th>Winner</th>
+            <th>Link</th>
+        </tr>
+        {% for game in current_user.games %}
+        <tr>
+            <td>{{ game.id }}</td>
+            <td>{{ game.first_player.username }}</td>
+            <td>{{ game.second_player.username }}</td>
+            {% if game.victor %}
+            <td>{{ game.victor.username }}</td>
+            {% else %}
+            <td><i>Game still in progress</i></td>
+            {% endif %}
+            <td><a href="{{ url_for('game.board', game_id=game.id) }}">Go to game</a></td>
+        </tr>
+        {% endfor %}
+    </table>
+    {% else %}
+    <p>You haven't played any games yet!</p>
+    {% endif %}
+    <p><a href="{{ url_for('game.new') }}">Click here</a> to start a new game.</p>
+</div>
 {% endblock %}

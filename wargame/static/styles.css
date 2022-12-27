@@ -21,9 +21,15 @@ body {
     padding: 5px;
 }
 
+#home {
+    text-align: center;
+    padding: 5px;
+}
+
 table {
     border: 2px solid;
     margin: 10px;
+    margin-inline: auto;
 }
 
 th, td {
