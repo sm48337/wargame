@@ -3,17 +3,13 @@
 {% block content %}
 <script>
     const addClassToTargetOnHover = (selector, className) => {
-        console.log(selector);
         const selected = document.querySelectorAll(selector);
-        console.log(selected);
-        selected.forEach(a => {
-            const target = document.querySelector('#' + a.attributes.target.value);
-            console.log(a);
-            a.addEventListener('mouseenter', () => {
-                console.log('triggered');
+        selected.forEach(source => {
+            const target = document.querySelector('#' + source.attributes.target.value);
+            source.addEventListener('mouseenter', () => {
                 target.classList.add(className);
             });
-            a.addEventListener('mouseleave', () => {
+            source.addEventListener('mouseleave', () => {
                 target.classList.remove(className);
             });
         });
@@ -33,8 +29,7 @@
             <div class="triangle">
                 {% for entity in context.teams[team].entities %}
                 <div class="card" id={{ entity.id }}>
-                    {% with %}
-                        {% set context = entity %}
+                    {% with context = entity %}
                         {% include 'entity.html' %}
                     {% endwith %}
                 </div>
