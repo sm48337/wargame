@@ -30,7 +30,7 @@ def logout():
     logout_user()
     flash('You have successfully logged out!')
 
-    return render_template('login.html')
+    return redirect(url_for('auth.login'))
 
 
 @bp.route('/register', methods=['GET', 'POST'])
