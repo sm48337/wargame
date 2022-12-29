@@ -1,5 +1,6 @@
 from flask_login.mixins import UserMixin
 from sqlalchemy import Column, ForeignKey, String, Integer, Boolean, JSON, or_
+from sqlalchemy.ext.mutable import MutableDict
 from sqlalchemy.orm import relationship
 from .db import db
 
@@ -38,6 +39,6 @@ class Game(db.Model):
     first_player = relationship('User', foreign_keys=[first_player_id])
     second_player_id = Column(ForeignKey('user.id'), nullable=False)
     second_player = relationship('User', foreign_keys=[second_player_id])
-    board_state = Column(JSON)
+    board_state = Column(MutableDict.as_mutable(JSON))
     victor_id = Column(ForeignKey('user.id'), nullable=True)
     victor = relationship('User', foreign_keys=[victor_id])
