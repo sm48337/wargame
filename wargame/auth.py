@@ -19,7 +19,7 @@ def login():
         login_user(user)
         next = request.args.get('next')
         return redirect(next or url_for('game.home'))
-    flash('Wrong username or password!')
+    flash('Wrong username or password!', 'error')
     return render_template('login.html', form=request.form)
 
 
@@ -28,7 +28,7 @@ def login():
 def logout():
     """Logout the current user."""
     logout_user()
-    flash('You have successfully logged out!')
+    flash('You have successfully logged out!', 'info')
 
     return redirect(url_for('auth.login'))
 

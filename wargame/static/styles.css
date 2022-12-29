@@ -210,6 +210,25 @@ div.registration {
 
 .flashes {
     list-style: none;
-    color: red;
     text-align: center;
+}
+
+.error {
+    --flash-color: red;
+}
+
+.warning {
+    --flash-color: yellow;
+}
+
+.info {
+    --flash-color: green;
+}
+
+ul.flashes {
+    padding: 0px;
+}
+
+.flashes > li {
+    color: var(--flash-color, red);
 }
