@@ -15,12 +15,37 @@
         });
     };
 
+    const makeOnlySelectedOptionVisible = () => {
+        const actionRadios = document.querySelectorAll('.entity-actions input[type="radio"]');
+        actionRadios.forEach(radio => {
+            const controlledInput = document.querySelector('.' + radio.id);
+            const entityId = radio.parentNode.parentNode.parentNode.parentNode.id;
+            const allHiddenInputs = Array.from(document.querySelectorAll(`#${entityId} .action-hide`));
+
+            radio.addEventListener('change', () => {
+                allHiddenInputs.forEach(input => input.classList.add('action-hide'));
+                if (controlledInput) controlledInput.classList.remove('action-hide');
+            });
+        });
+    };
+
     window.onload = () => {
         addClassToTargetOnHover('.attack', 'attack-target');
         addClassToTargetOnHover('.transfer', 'transfer-target');
+        makeOnlySelectedOptionVisible();
     };
-
 </script>
+<div>
+    {% with messages = get_flashed_messages(category_filter=['validation'], with_categories=true) %}
+    {% if messages %}
+    <ul class="flashes">
+        {% for category, message in messages %}
+        <li class="{{ category }}">{{ message }}</li>
+        {% endfor %}
+    </ul>
+    {% endif %}
+    {% endwith %}
+</div>
 <form id="board" method="post" action="board">
     <div class="month">{{ context.month }}</div>
     {% for team in context.teams %}

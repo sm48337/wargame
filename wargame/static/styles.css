@@ -145,13 +145,17 @@ th, td {
     border: 2px solid blue;
 }
 
-.entity-connections {
+.entity-actions {
     display: none;
     border: 2px solid black;
 }
 
-.card:hover .entity-connections {
+.card:hover .entity-actions {
     display: block;
+}
+
+.action-hide {
+    display: none;
 }
 
 .transfer-target {
