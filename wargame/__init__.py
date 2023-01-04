@@ -18,7 +18,7 @@ def create_app():
     app.config['SQLALCHEMY_DATABASE_URI'] = db_path
     app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
-    from . import api, auth, game
+    from . import api, auth, game, utils
 
     app.register_blueprint(api.bp)
     app.register_blueprint(auth.bp)
@@ -33,6 +33,8 @@ def create_app():
     with app.app_context():
         db.create_all()
         db.session.commit()
+
+    app.context_processor(utils.helper_functions)
 
     return app
 

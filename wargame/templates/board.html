@@ -47,7 +47,7 @@
     {% endwith %}
 </div>
 <form id="board" method="post" action="board">
-    <div class="month">{{ context.month }}</div>
+    <div class="month">{{ turn_to_month(context.turn) }}</div>
     {% for team in context.teams %}
     <div id="{{ team }}">
         <div class="core">
