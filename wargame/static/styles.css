@@ -146,12 +146,22 @@ th, td {
 }
 
 .entity-actions {
+    position: absolute;
     display: none;
     border: 2px solid black;
+    width: var(--card-width);
 }
 
 .card:hover .entity-actions {
     display: block;
+}
+
+#blue .entity-actions {
+    bottom: 100%;
+}
+
+#red .entity-actions {
+    transform: translate(0, 25px);
 }
 
 .action-hide {
