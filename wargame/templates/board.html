@@ -48,6 +48,7 @@
 </div>
 <form id="board" method="post" action="board">
     <div class="month">{{ turn_to_month(context.turn) }}</div>
+    <input type="hidden" id="turn" name="turn" value="{{ context.turn }}">
     {% for team in context.teams %}
     <div id="{{ team }}">
         <div class="core">

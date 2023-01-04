@@ -46,6 +46,9 @@ class Game(db.Model):
     def perform_checks(self, inputs):
         validation_errors = list()
 
+        if self.board_state['turn'] != int(inputs['turn']):
+            validation_errors.append(('The turn had already ended!', 'error'))
+
         if self.board_state['turn'] >= 12:
             validation_errors.append(('The game is finished!', 'error'))
 
