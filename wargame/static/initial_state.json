@@ -1,0 +1,121 @@
+{
+  "turn": 1,
+  "teams": {
+    "red": {
+      "entities": [
+        {
+          "id": "bear",
+          "name": "Energetic Bear",
+          "image": "/static/entities/russia-bear.jpg",
+          "connections": [
+            "rus_gov"
+          ],
+          "resource": 3,
+          "vitality": 4
+        },
+        {
+          "id": "trolls",
+          "name": "Online Trolls",
+          "image": "/static/entities/russia-troll.jpg",
+          "resource": 3,
+          "vitality": 4
+        },
+        {
+          "id": "rus_gov",
+          "name": "Government",
+          "image": "/static/entities/russia-gov.jpg",
+          "connections": [
+            "bear",
+            "ros",
+            "scs",
+            "trolls"
+          ],
+          "resource": 3,
+          "vitality": 4
+        },
+        {
+          "id": "scs",
+          "name": "SCS",
+          "image": "/static/entities/russia-scs.png",
+          "connections": [
+            "bear",
+            "rus_gov"
+          ],
+          "resource": 3,
+          "vitality": 4
+        },
+        {
+          "id": "ros",
+          "name": "Rosenergoatom",
+          "image": "/static/entities/russia-energy.png",
+          "connections": [
+            "rus_gov"
+          ],
+          "resource": 3,
+          "vitality": 4
+        }
+      ]
+    },
+    "blue": {
+      "entities": [
+        {
+          "id": "gchq",
+          "name": "GCHQ",
+          "image": "/static/entities/uk-gchq.png",
+          "connections": [
+            "uk_gov"
+          ],
+          "resource": 3,
+          "vitality": 4
+        },
+        {
+          "id": "energy",
+          "name": "UK Energy",
+          "image": "/static/entities/uk-energy.png",
+          "connections": [
+            "elect",
+            "uk_gov"
+          ],
+          "resource": 3,
+          "vitality": 4
+        },
+        {
+          "id": "uk_gov",
+          "name": "Government",
+          "image": "/static/entities/uk-gov.jpg",
+          "connections": [
+            "elect",
+            "energy",
+            "gchq",
+            "plc"
+          ],
+          "resource": 3,
+          "vitality": 4
+        },
+        {
+          "id": "plc",
+          "name": "UK PLC",
+          "image": "/static/entities/uk-plc.png",
+          "connections": [
+            "gchq",
+            "uk_gov"
+          ],
+          "resource": 3,
+          "vitality": 4
+        },
+        {
+          "id": "elect",
+          "name": "Electorate",
+          "image": "/static/entities/uk-voters.jpg",
+          "connections": [
+            "energy",
+            "plc",
+            "uk_gov"
+          ],
+          "resource": 3,
+          "vitality": 4
+        }
+      ]
+    }
+  }
+}

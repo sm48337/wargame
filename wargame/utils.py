@@ -1,3 +1,14 @@
+from functools import cache
+from json import load
+
+
+@cache
+def get_initial_board_state():
+    with open('wargame/static/initial_state.json') as f:
+        state = load(f)
+        return state
+
+
 months = (
     'January',
     'February',

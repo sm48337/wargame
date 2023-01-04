@@ -3,7 +3,7 @@ from http import HTTPStatus
 from secrets import token_hex
 
 from flask import Flask, abort, redirect, url_for, request
-from flask_login import LoginManager, utils
+from flask_login import LoginManager, utils as flask_utils
 
 login_manager = LoginManager()
 login_manager.login_view = "auth.login"
@@ -49,7 +49,7 @@ def load_user(user_id):
 def unauthorized():
     if request.blueprint == 'api':
         abort(HTTPStatus.UNAUTHORIZED)
-    next_param = utils.make_next_param(url_for('auth.login'), request.url)
+    next_param = flask_utils.make_next_param(url_for('auth.login'), request.url)
     return redirect(url_for('auth.login', next=next_param))
 
 
