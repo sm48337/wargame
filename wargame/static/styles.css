@@ -246,3 +246,23 @@ ul.flashes {
 .flashes > li {
     color: var(--flash-color, red);
 }
+
+#message-log {
+    position: absolute;
+    bottom: -50px;
+    height: 20%;
+    width: 10%;
+    background-color: lightgray;
+    padding: 5px;
+    border: 2px solid;
+    overflow: scroll;
+}
+
+#message-log ul {
+    list-style: none;
+    padding: 0;
+}
+
+#message-log li {
+    border-bottom: 2px solid gray;
+}

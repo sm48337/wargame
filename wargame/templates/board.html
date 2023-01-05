@@ -47,13 +47,13 @@
     {% endwith %}
 </div>
 <form id="board" method="post" action="board">
-    <div class="month">{{ turn_to_month(context.turn) }}</div>
-    <input type="hidden" id="turn" name="turn" value="{{ context.turn }}">
-    {% for team in context.teams %}
+    <div class="month">{{ turn_to_month(context.board_state.turn) }}</div>
+    <input type="hidden" id="turn" name="turn" value="{{ context.board_state.turn }}">
+    {% for team in context.board_state.teams %}
     <div id="{{ team }}">
         <div class="core">
             <div class="triangle">
-                {% for entity in context.teams[team].entities %}
+                {% for entity in context.board_state.teams[team].entities %}
                 <div class="card" id={{ entity.id }}>
                     {% with context = entity %}
                         {% include 'entity.html' %}
@@ -64,6 +64,14 @@
         </div>
     </div>
     {% endfor %}
+    <fieldset id="message-log">
+        <legend>Message Log</legend>
+        <ul>
+            {% for msg in context.message_log | reverse %}
+            <li>{{ msg }}</li>
+            {% endfor %}
+        </ul>
+    </fieldset>
     <input type="submit" value="Finish turn" class="finish-turn-btn">
 </form>
 {% endblock %}

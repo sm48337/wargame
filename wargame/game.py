@@ -41,9 +41,9 @@ def board(game_id):
         if errors := game.perform_checks(request.form):
             for message, category in errors:
                 flash(message, category)
-            return render_template('board.html', context=game.board_state)
+            return render_template('board.html', context=game)
 
         game.process_turn(request.form)
         db.session.commit()
 
-    return render_template('board.html', context=game.board_state)
+    return render_template('board.html', context=game)
