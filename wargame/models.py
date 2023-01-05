@@ -55,7 +55,7 @@ class Game(db.Model):
         if self.board_state['turn'] != int(inputs['turn']):
             validation_errors.append(('The turn had already ended!', 'error'))
 
-        if self.board_state['turn'] >= 12:
+        if self.board_state['turn'] >= 23:
             validation_errors.append(('The game is finished!', 'error'))
 
         return validation_errors
@@ -64,7 +64,9 @@ class Game(db.Model):
         ...
 
     def progress_time(self):
-        self.message_log.append(f"End of turn {self.board_state['turn']}.")
+        turn = self.board_state['turn']
+        current_team = 'red' if turn % 2 == 0 else 'blue'
+        self.message_log.append(f'End of turn {turn // 2} for the {current_team} team.')
         self.board_state['turn'] += 1
 
     def determine_winner(self):
@@ -80,18 +82,14 @@ class Game(db.Model):
                 case 'trolls':
                     entity['attacks'] = ['elect']
 
-    def all_players_ready(self):
-        return True
-
     def process_turn(self, inputs):
         self.process_inputs(inputs)
 
-        if self.all_players_ready():
-            self.progress_time()
+        self.progress_time()
 
-            if self.board_state['turn'] == 2:
-                self.enable_attacks()
-            elif self.board_state['turn'] == 12:
-                self.determine_winner()
+        if self.board_state['turn'] == 4:
+            self.enable_attacks()
+        elif self.board_state['turn'] == 23:
+            self.determine_winner()
 
-            self.history.append(self.board_state)
+        self.history.append(self.board_state)

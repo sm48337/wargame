@@ -24,9 +24,11 @@ months = (
     'December',
 )
 
+teams = ('Red', 'Blue')
+
 
 def helper_functions():
     def turn_to_month(turn):
-        return months[turn - 1]
+        return f"{months[turn // 2]} / {teams[turn % 2]} team's turn"
 
     return dict(turn_to_month=turn_to_month)
