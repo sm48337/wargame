@@ -1,13 +1,13 @@
 <div class="entity-display">
-    <img src="{{ context.image }}">
-    <span class="entity-name">{{ context.name }}</span>
+    <img src="{{ entity.image }}">
+    <span class="entity-name">{{ entity.name }}</span>
 </div>
 <div class="entity-stats">
     <div class="entity-resources">
-        Resource - {{ context.resource }}
+        Resource - {{ entity.resource }}
     </div>
     <div class="entity-vitality">
-        Vitality - {{ context.vitality }}
+        Vitality - {{ entity.vitality }}
     </div>
 </div>
 <div class="entity-actions">
@@ -15,39 +15,39 @@
         <legend>Actions</legend>
         {% if entity.connections %}
         <div>
-            <input type="radio" id="{{ entity.id }}-transfer" name="{{ entity.id }}-action" value="transfer">
-            <label for="{{ entity.id }}-transfer">Transfer</label>
+            <input type="radio" id="{{ entity.id }}__transfer" name="{{ entity.id }}__action" value="transfer" autocomplete="off">
+            <label for="{{ entity.id }}__transfer">Transfer</label>
         </div>
         {% endif %}
         {% if entity.attacks %}
         <div>
-            <input type="radio" id="{{ entity.id }}-attack" name="{{ entity.id }}-action" value="attack">
-            <label for="{{ entity.id }}-attack">Attack</label>
+            <input type="radio" id="{{ entity.id }}__attack" name="{{ entity.id }}__action" value="attack" autocomplete="off">
+            <label for="{{ entity.id }}__attack">Attack</label>
         </div>
         {% endif %}
         <div>
-            <input type="radio" id="{{ entity.id }}-revitalize" name="{{ entity.id }}-action" value="revitalize">
-            <label for="{{ entity.id }}-revitalize">Revitalize</label>
+            <input type="radio" id="{{ entity.id }}__revitalize" name="{{ entity.id }}__action" value="revitalize" autocomplete="off">
+            <label for="{{ entity.id }}__revitalize">Revitalize</label>
         </div>
         <div>
-            <input type="radio" id="{{ entity.id }}-none" name="{{ entity.id }}-action" value="none" checked>
-            <label for="{{ entity.id }}-none">None</label>
+            <input type="radio" id="{{ entity.id }}__none" name="{{ entity.id }}__action" value="none" autocomplete="off" checked>
+            <label for="{{ entity.id }}__none">None</label>
         </div>
         {% for target in entity.connections %}
-        <div class="{{ entity.id }}-transfer action-hide" target="{{ target }}">
+        <div class="transfer {{ entity.id }}__transfer action-hide" target="{{ target }}">
             Transfer to {{ target }}:
-            <input type="number" placeholder=0 min=0 max=5 name="{{ entity.id }}-{{ target }}-transfer"></input>
+            <input class="{{ entity.id }}__transfer-input" type="number" data-value=0 placeholder=0 min=0 max={{ [entity.resource, 5] | min }} name="{{ entity.id }}-{{ target }}__transfer" autocomplete="off"></input>
         </div>
         {% endfor %}
         {% for target in entity.attacks %}
-        <div class="{{ entity.id }}-attack action-hide" target="{{ target }}">
+        <div class="attack {{ entity.id }}__attack action-hide" target="{{ target }}">
             Attack {{ target }}:
-            <input type="number" placeholder=0 min=0 max=5 name="{{ entity.id }}-{{ target }}-attack"></input>
+            <input type="number" placeholder=0 min=0 max={{ [entity.resource, 6] | min }} name="{{ entity.id }}-{{ target }}__attack" autocomplete="off"></input>
         </div>
         {% endfor %}
-        <div class="{{ entity.id }}-revitalize action-hide">
-            Spend resources to increase Vitality
-            <input type="number" placeholder=0 min=0 max=5 name="revitalize"></input>
+        <div class="{{ entity.id }}__revitalize action-hide">
+            Amount of vitality to recover. Cost: <span class="vitality-cost">0</span>
+            <input type="number" placeholder=0 min=0 max={{ [calculate_max_revitalization(entity.resource), 6] | min }} class="revitalize-amount" name="{{ entity.id }}__revitalize" autocomplete="off"></input>
         </div>
     </fieldset>
 </div>

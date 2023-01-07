@@ -18,13 +18,46 @@
     const makeOnlySelectedOptionVisible = () => {
         const actionRadios = document.querySelectorAll('.entity-actions input[type="radio"]');
         actionRadios.forEach(radio => {
-            const controlledInput = document.querySelector('.' + radio.id);
+            const controlledInputs = document.querySelectorAll('.' + radio.id);
             const entityId = radio.parentNode.parentNode.parentNode.parentNode.id;
             const allHiddenInputs = Array.from(document.querySelectorAll(`#${entityId} .action-hide`));
 
             radio.addEventListener('change', () => {
                 allHiddenInputs.forEach(input => input.classList.add('action-hide'));
-                if (controlledInput) controlledInput.classList.remove('action-hide');
+                if (controlledInputs) controlledInputs.forEach(input => input.classList.remove('action-hide'));
+            });
+        });
+    };
+
+    const displayRevitalizeCost = () => {
+        const costMapping = {{ vitality_recovery_cost }};
+        const revitalizeInputs = document.querySelectorAll('.revitalize-amount');
+        revitalizeInputs.forEach(input => input.addEventListener('change', e => {
+            const amount = e.target.valueAsNumber;
+            input.previousElementSibling.textContent = costMapping[amount];
+        }));
+    };
+
+    const changeMaxTransferValue = () => {
+        const inputsByEntity = {};
+        const transferInputs = document.querySelectorAll('[class*=__transfer-input]');
+        transferInputs.forEach(input => {
+            const entityId = input.className.split('__')[0];
+            if (inputsByEntity[entityId]) {
+                inputsByEntity[entityId].push(input);
+            } else {
+                inputsByEntity[entityId] = [input];
+            }
+        });
+        Object.values(inputsByEntity).forEach(entityInputs => {
+            entityInputs.forEach(input => {
+                input.addEventListener('change', e => {
+                    const amountChanged = e.target.value - e.target.dataset.value;
+                    e.target.dataset.value = e.target.value;
+                    entityInputs.filter(i => i !== input).forEach(otherInput => {
+                        otherInput.max -= amountChanged;
+                    });
+                });
             });
         });
     };
@@ -33,6 +66,8 @@
         addClassToTargetOnHover('.attack', 'attack-target');
         addClassToTargetOnHover('.transfer', 'transfer-target');
         makeOnlySelectedOptionVisible();
+        displayRevitalizeCost();
+        changeMaxTransferValue();
     };
 </script>
 <div>
@@ -55,9 +90,7 @@
             <div class="triangle">
                 {% for entity in context.board_state.teams[team].entities %}
                 <div class="card" id={{ entity.id }}>
-                    {% with context = entity %}
-                        {% include 'entity.html' %}
-                    {% endwith %}
+                    {% include 'entity.html' %}
                 </div>
                 {% endfor %}
             </div>

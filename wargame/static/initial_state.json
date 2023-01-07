@@ -1,5 +1,5 @@
 {
-  "turn": 1,
+  "turn": 0,
   "teams": {
     "red": {
       "entities": [
@@ -22,7 +22,7 @@
         },
         {
           "id": "rus_gov",
-          "name": "Government",
+          "name": "Russian Government",
           "image": "/static/entities/russia-gov.jpg",
           "connections": [
             "bear",
@@ -81,7 +81,7 @@
         },
         {
           "id": "uk_gov",
-          "name": "Government",
+          "name": "UK Government",
           "image": "/static/entities/uk-gov.jpg",
           "connections": [
             "elect",
