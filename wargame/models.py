@@ -6,7 +6,8 @@ from sqlalchemy.ext.mutable import MutableDict, MutableList
 from sqlalchemy.orm import relationship
 from .db import db
 from .utils import (
-    attack_result_table, current_team, opposing_team, find_attack_targets, find_transfer_targets, teams, vitality_recovery_cost, end_of_month, total_vps
+    attack_result_table, current_team, opposing_team, find_attack_targets, find_transfer_targets,
+    teams, vitality_recovery_cost, end_of_month, get_ends_of_months, total_vps
 )
 
 
@@ -204,7 +205,7 @@ class Game(db.Model):
             )
             entities['uk_gov']['victory_points'] += 5
 
-        plc_triggers = tuple(map(end_of_month, (4, 8, 12)))
+        plc_triggers = get_ends_of_months(4, 8, 12)
         if turn in plc_triggers:
             index = plc_triggers.index(turn)
             limit = (index + 1) * 3
@@ -215,7 +216,7 @@ class Game(db.Model):
                     f'Weather the Brexit storm - UK PLC gains {amount_won} VP because it had more than {limit} resources at the end of the quarter.'
                 )
 
-        quarter_ends = map(end_of_month, (3, 6, 9, 12))
+        quarter_ends = get_ends_of_months(3, 6, 9, 12)
         if turn in quarter_ends:
             plc = entities['plc']
             rd = plc['traits']['recruitment_drive']
@@ -228,7 +229,7 @@ class Game(db.Model):
                 rd['count'] = 0
             rd['vitality'] = plc['vitality']
 
-        year_halves = tuple(map(end_of_month, (6, 12)))
+        year_halves = get_ends_of_months(6, 12)
         if turn in year_halves:
             index = year_halves.index(turn)
             limit = 6 + index * 3
@@ -251,7 +252,7 @@ class Game(db.Model):
                 'Some animals are more equal than others - Russian Government gains 1 VP because it ended the month with more than 3 resources.'
             )
 
-        bear_triggers = tuple(map(end_of_month, (4, 8, 12)))
+        bear_triggers = get_ends_of_months(4, 8, 12)
         if turn in bear_triggers:
             bear = entities['bear']
             index = bear_triggers.index(turn)
@@ -265,7 +266,7 @@ class Game(db.Model):
             entities['scs']['victory_points'] += 2
             self.message_log.append('Win the arms race - SCS gains 2 VPs because Russia has a better cyber arsenal than the UK.')
 
-        quarter_ends = map(end_of_month, (3, 6, 9, 12))
+        quarter_ends = get_ends_of_months(3, 6, 9, 12)
         if turn in quarter_ends:
             ros = entities['ros']
             gc = ros['traits']['grow_capacity']

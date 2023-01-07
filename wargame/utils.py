@@ -88,6 +88,10 @@ def end_of_month(month):
     return 2 * month - 1
 
 
+def get_ends_of_months(*args):
+    return tuple(map(end_of_month, *args))
+
+
 def turn_to_month(turn):
     return f"{months[turn // 2]} / {current_team(turn).capitalize()} team's turn"
 
