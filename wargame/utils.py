@@ -84,6 +84,10 @@ def opposing_team(turn):
     return teams[1 - turn % 2]
 
 
+def end_of_month(month):
+    return 2 * month - 1
+
+
 def turn_to_month(turn):
     return f"{months[turn // 2]} / {current_team(turn).capitalize()} team's turn"
 
