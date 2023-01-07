@@ -1,6 +1,8 @@
 :root {
-    --card-height: 50px;
-    --card-width: 200px;
+    --card-height: 80px;
+    --card-width: 250px;
+    --light-background: #d3d3d3;
+    --dark-background: #b5b5b5;
 }
 
 body {
@@ -114,10 +116,11 @@ th, td {
 }
 
 .card div {
-    background: darkgray;
+    background: var(--dark-background);
 }
 
 .entity-display {
+    text-align: center;
 }
 
 .entity-display img {
@@ -131,6 +134,7 @@ th, td {
 .entity-resources, .entity-vitality {
     width: 50%;
     box-sizing: border-box;
+    text-align: center;
 }
 
 .entity-resources {
@@ -150,6 +154,7 @@ th, td {
     display: none;
     border: 2px solid black;
     width: var(--card-width);
+    z-index: 100;
 }
 
 .card:hover .entity-actions {
@@ -180,7 +185,7 @@ th, td {
     position: absolute;
     right: 30px;
     top: 70px;
-    background: lightgray;
+    background: var(--light-background);
     padding: 5px;
     border: 2px solid black;
     border-radius: 5px;
@@ -239,6 +244,10 @@ div.registration {
     --flash-color: green;
 }
 
+.validation {
+    --flash-color: red;
+}
+
 ul.flashes {
     padding: 0px;
 }
@@ -250,9 +259,9 @@ ul.flashes {
 #message-log {
     position: absolute;
     bottom: -50px;
-    height: 20%;
-    width: 10%;
-    background-color: lightgray;
+    height: 25%;
+    width: 15%;
+    background-color: var(--light-background);
     padding: 5px;
     border: 2px solid;
     overflow: scroll;
@@ -265,4 +274,10 @@ ul.flashes {
 
 #message-log li {
     border-bottom: 2px solid gray;
+    font-size: 0.9rem;
+    font-family: sans-serif;
+}
+
+#message-log li:nth-child(even) {
+    background: var(--dark-background);
 }
