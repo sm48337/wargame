@@ -167,9 +167,9 @@ class Game(db.Model):
 
     def process_turn(self, inputs):
         self.process_inputs(inputs)
-        self.give_resources()
-
         self.progress_time()
+
+        self.give_resources()
 
         if self.board_state['turn'] == 2:
             self.enable_attacks()
