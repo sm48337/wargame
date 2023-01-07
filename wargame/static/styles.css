@@ -125,6 +125,11 @@ th, td {
     height: 50px;
 }
 
+.entity-vp {
+    float: right;
+    padding: 5px;
+}
+
 .entity-stats {
     bottom: 0;
 }
@@ -179,14 +184,21 @@ th, td {
     border: 2px solid red;
 }
 
-.month {
+.game-info > div {
     position: absolute;
     right: 30px;
-    top: 70px;
     background: var(--light-background);
     padding: 5px;
     border: 2px solid black;
     border-radius: 5px;
+}
+
+.month {
+    top: 70px;
+}
+
+.team-vps {
+    top: 110px;
 }
 
 .finish-turn-btn {

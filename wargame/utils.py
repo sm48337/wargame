@@ -92,6 +92,13 @@ def turn_to_month(turn):
     return f"{months[turn // 2]} / {current_team(turn).capitalize()} team's turn"
 
 
+def total_vps(team):
+    vps = 0
+    for entity in team['entities'].values():
+        vps += entity['victory_points']
+    return vps
+
+
 def helper_functions():
     return dict(
         turn_to_month=turn_to_month,
@@ -99,4 +106,5 @@ def helper_functions():
         vitality_recovery_cost=vitality_recovery_cost,
         calculate_max_revitalization=calculate_max_revitalization,
         display_name=display_name,
+        total_vps=total_vps,
     )

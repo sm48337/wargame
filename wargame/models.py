@@ -5,7 +5,9 @@ from sqlalchemy import Column, ForeignKey, String, Integer, Boolean, JSON, or_
 from sqlalchemy.ext.mutable import MutableDict, MutableList
 from sqlalchemy.orm import relationship
 from .db import db
-from .utils import attack_result_table, current_team, opposing_team, find_attack_targets, find_transfer_targets, teams, vitality_recovery_cost, end_of_month
+from .utils import (
+    attack_result_table, current_team, opposing_team, find_attack_targets, find_transfer_targets, teams, vitality_recovery_cost, end_of_month, total_vps
+)
 
 
 class User(db.Model, UserMixin):
@@ -80,7 +82,7 @@ class Game(db.Model):
         if turn != int(inputs['turn']):
             validation_errors.append(('The turn had already ended!', 'error'))
 
-        if turn >= 23:
+        if self.victor is not None:
             validation_errors.append(('The game is finished!', 'error'))
 
         return validation_errors
@@ -92,11 +94,23 @@ class Game(db.Model):
         entity['resource'] -= recovery_cost
         self.message_log.append(f"{entity['name']} spent {recovery_cost} resources to gain {vitality_recovered} vitality.")
 
+    def _entity_destroyed_check(self, entity, entity_team):
+        if entity['vitality'] <= 0:
+            opposing_team = teams[1 - teams.index(entity_team)]
+            entities = self.board_state['teams'][opposing_team]['entities']
+            gov = entities.get('uk_gov') or entities.get('rus_gov')
+            gov['victory_points'] += 10
+            self.determine_winner()
+            self.message_log.append(f"{entity['name']} was dealt fatal damage. Opponent was awarded 10 VPs and the game ended.")
+
     def _do_damage(self, target_id, amount, target_team):
         connections, target = self.get_all_connections(target_id, target_team)
         target['vitality'] -= amount
+        self._entity_destroyed_check(target, target_team)
+
         for connection in connections.values():
             connection['vitality'] -= amount // 2
+            self._entity_destroyed_check(connection, target_team)
         self.message_log.append(f"{target['name']} was dealt {amount} damage. Connected entities got {amount // 2} damage.")
 
     def _do_attribution(self):
@@ -165,8 +179,11 @@ class Game(db.Model):
         self.board_state['turn'] += 1
 
     def determine_winner(self):
-        self.victor = self.first_player
-        self.message_log.append(f'Player {self.victor.username} won the game.')
+        teams = self.board_state['teams']
+        red_vps = total_vps(teams['red'])
+        blue_vps = total_vps(teams['blue'])
+        self.victor = self.first_player if red_vps > blue_vps else self.second_player
+        self.message_log.append(f'Player {self.victor.username} won the game having {red_vps} VPs. The opponent had {blue_vps} VPs.')
 
     def enable_attacks(self):
         self.message_log.append('Attacks enabled.')
@@ -181,12 +198,11 @@ class Game(db.Model):
         if entities['elect']['resource'] >= 4:
             entities['uk_gov']['victory_points'] += 1
             self.message_log.append('Election time - UK Government gains 1 VP because a month ended with Electorate having 4 or more resources.')
-        if turn == end_of_month(12):
-            if entities['rus_gov']['vitality'] < 4:
-                self.message_log.append(
-                    'Aggressive outlook - UK Government gains 5 VPs because the Russian Government ended the game with less vitality than it started with.'
-                )
-                entities['uk_gov']['victory_points'] += 5
+        if turn == end_of_month(12) and entities['rus_gov']['vitality'] < 4:
+            self.message_log.append(
+                'Aggressive outlook - UK Government gains 5 VPs because the Russian Government ended the game with less vitality than it started with.'
+            )
+            entities['uk_gov']['victory_points'] += 5
 
         plc_triggers = tuple(map(end_of_month, (4, 8, 12)))
         if turn in plc_triggers:
