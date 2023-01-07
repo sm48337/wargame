@@ -58,18 +58,17 @@ class Game(db.Model):
 
     def get_entity(self, entity_id):
         for team in teams:
-            for entity in self.board_state['teams'][team]['entities']:
-                if entity['id'] == entity_id:
-                    return entity
+            if entity := self.board_state['teams'][team]['entities'].get(entity_id):
+                return entity
 
     def get_all_connections(self, entity_id, entity_team):
         entities = self.board_state['teams'][entity_team]['entities']
-        [entity] = filter(lambda e: e['id'] == entity_id, entities)
+        entity = entities[entity_id]
         connected_entities = dict()
-        for connection in entities:
+        for connection in entities.values():
             if connection['id'] in entity['connections']:
                 connected_entities[connection['id']] = connection
-        for candidate in entities:
+        for candidate in entities.values():
             if entity in candidate['connections']:
                 connected_entities[candidate['id']] = candidate
         return connected_entities, entity
@@ -129,7 +128,7 @@ class Game(db.Model):
                 self.message_log.append(f"{entity['name']} sent {transfer_amount} resources to {target['name']}.")
 
     def process_inputs(self, inputs):
-        for entity in self.get_current_entities():
+        for entity in self.get_current_entities().values():
             if action := inputs.get(entity['id'] + '__action'):
                 match action:
                     case '' | 'none':
@@ -142,10 +141,10 @@ class Game(db.Model):
                         self._do_transfer(entity, inputs)
 
     def give_resources(self):
-        for entity in self.get_current_entities():
-            if entity['id'].endswith('_gov'):
-                entity['resource'] += 3
-                self.message_log.append(f"{entity['name']} gains 3 resources.")
+        entities = self.get_current_entities()
+        gov_entity = entities.get('rus_gov') or entities.get('uk_gov')
+        gov_entity['resource'] += 3
+        self.message_log.append(f"{gov_entity['name']} gains 3 resources.")
 
     def progress_time(self):
         turn = self.board_state['turn']
@@ -158,7 +157,7 @@ class Game(db.Model):
 
     def enable_attacks(self):
         self.message_log.append('Attacks enabled.')
-        for entity in self.board_state['teams']['red']['entities']:
+        for entity in self.board_state['teams']['red']['entities'].values():
             match entity['id']:
                 case 'bear':
                     entity['attacks'] = ['plc']

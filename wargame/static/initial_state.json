@@ -2,8 +2,8 @@
   "turn": 0,
   "teams": {
     "red": {
-      "entities": [
-        {
+      "entities": {
+        "bear": {
           "id": "bear",
           "name": "Energetic Bear",
           "image": "/static/entities/russia-bear.jpg",
@@ -13,14 +13,14 @@
           "resource": 3,
           "vitality": 4
         },
-        {
+        "trolls": {
           "id": "trolls",
           "name": "Online Trolls",
           "image": "/static/entities/russia-troll.jpg",
           "resource": 3,
           "vitality": 4
         },
-        {
+        "rus_gov": {
           "id": "rus_gov",
           "name": "Russian Government",
           "image": "/static/entities/russia-gov.jpg",
@@ -30,10 +30,10 @@
             "scs",
             "trolls"
           ],
-          "resource": 3,
+          "resource": 6,
           "vitality": 4
         },
-        {
+        "scs": {
           "id": "scs",
           "name": "SCS",
           "image": "/static/entities/russia-scs.png",
@@ -44,7 +44,7 @@
           "resource": 3,
           "vitality": 4
         },
-        {
+        "ros": {
           "id": "ros",
           "name": "Rosenergoatom",
           "image": "/static/entities/russia-energy.png",
@@ -54,11 +54,11 @@
           "resource": 3,
           "vitality": 4
         }
-      ]
+      }
     },
     "blue": {
-      "entities": [
-        {
+      "entities": {
+        "gchq": {
           "id": "gchq",
           "name": "GCHQ",
           "image": "/static/entities/uk-gchq.png",
@@ -68,7 +68,7 @@
           "resource": 3,
           "vitality": 4
         },
-        {
+        "energy": {
           "id": "energy",
           "name": "UK Energy",
           "image": "/static/entities/uk-energy.png",
@@ -79,7 +79,7 @@
           "resource": 3,
           "vitality": 4
         },
-        {
+        "uk_gov": {
           "id": "uk_gov",
           "name": "UK Government",
           "image": "/static/entities/uk-gov.jpg",
@@ -92,7 +92,7 @@
           "resource": 3,
           "vitality": 4
         },
-        {
+        "plc": {
           "id": "plc",
           "name": "UK PLC",
           "image": "/static/entities/uk-plc.png",
@@ -103,7 +103,7 @@
           "resource": 3,
           "vitality": 4
         },
-        {
+        "elect": {
           "id": "elect",
           "name": "Electorate",
           "image": "/static/entities/uk-voters.jpg",
@@ -115,7 +115,7 @@
           "resource": 3,
           "vitality": 4
         }
-      ]
+      }
     }
   }
 }
