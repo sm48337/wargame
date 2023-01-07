@@ -1,3 +1,4 @@
+from datetime import timedelta
 from functools import cache
 from json import load
 from re import match
@@ -89,7 +90,7 @@ def end_of_month(month):
 
 
 def get_ends_of_months(*args):
-    return tuple(map(end_of_month, *args))
+    return tuple(map(end_of_month, args))
 
 
 def turn_to_month(turn):
@@ -103,6 +104,10 @@ def total_vps(team):
     return vps
 
 
+def turn_end(turn_start):
+    return turn_start + timedelta(minutes=3)
+
+
 def helper_functions():
     return dict(
         turn_to_month=turn_to_month,
@@ -111,4 +116,5 @@ def helper_functions():
         calculate_max_revitalization=calculate_max_revitalization,
         display_name=display_name,
         total_vps=total_vps,
+        turn_end=turn_end,
     )

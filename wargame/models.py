@@ -1,7 +1,8 @@
 from random import randint
+from datetime import datetime
 
 from flask_login.mixins import UserMixin
-from sqlalchemy import Column, ForeignKey, String, Integer, Boolean, JSON, or_
+from sqlalchemy import Column, ForeignKey, String, Integer, Boolean, DateTime, JSON, or_
 from sqlalchemy.ext.mutable import MutableDict, MutableList
 from sqlalchemy.orm import relationship
 from .db import db
@@ -50,6 +51,7 @@ class Game(db.Model):
     message_log = Column(MutableList.as_mutable(JSON), default=list)
     victor_id = Column(ForeignKey('user.id'), nullable=True)
     victor = relationship('User', foreign_keys=[victor_id])
+    turn_start = Column(DateTime, default=datetime.now)
 
     def __init__(self, *args, **kwargs):
         kwargs['history'] = [kwargs['board_state']]
@@ -178,6 +180,7 @@ class Game(db.Model):
         turn = self.board_state['turn']
         self.message_log.append(f'End of turn {turn // 2 + 1} for the {current_team(turn).capitalize()} team.')
         self.board_state['turn'] += 1
+        self.turn_start = datetime.now()
 
     def determine_winner(self):
         teams = self.board_state['teams']

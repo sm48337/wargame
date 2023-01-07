@@ -184,6 +184,30 @@ th, td {
     border: 2px solid red;
 }
 
+#round-timer {
+    position: absolute;
+    background: var(--light-background);
+    padding: 5px;
+    border: 2px solid var(--highlight-color);
+    color: var(--highlight-color);
+    border-radius: 5px;
+    font-size: 1.2rem;
+    left: 50%;
+    transform: translateX(-50%);
+}
+
+.time-green {
+    --highlight-color: green;
+}
+
+.time-yellow {
+    --highlight-color: yellow;
+}
+
+.time-red {
+    --highlight-color: red;
+}
+
 .game-info > div {
     position: absolute;
     right: 30px;

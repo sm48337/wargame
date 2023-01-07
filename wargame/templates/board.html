@@ -62,12 +62,40 @@
         });
     };
 
+    const timerManagement = () => {
+        const display = document.querySelector('#round-timer');
+        const roundEnd = new Date("{{ turn_end(context.turn_start) }}");
+        const form = document.querySelector('#board');
+        const refreshTime = () => {
+            const timeLeft = new Date(roundEnd - new Date());
+            const options = {
+                minute: '2-digit',
+                second: '2-digit'
+            };
+            display.textContent = timeLeft.toLocaleTimeString('en-us', options);
+            if (timeLeft.getTime() <= 0) {
+                form.submit();
+            }
+            if (timeLeft.getTime() < 1 * 60 * 1000) {
+                display.classList.remove('time-green');
+                display.classList.remove('time-yellow');
+                display.classList.add('time-red');
+            } else if (timeLeft.getTime() < 2 * 60 * 1000) {
+                display.classList.remove('time-green');
+                display.classList.add('time-yellow');
+            }
+        };
+        setInterval(refreshTime, 1000);
+        refreshTime();
+    }
+
     window.onload = () => {
         addClassToTargetOnHover('.attack', 'attack-target');
         addClassToTargetOnHover('.transfer', 'transfer-target');
         makeOnlySelectedOptionVisible();
         displayRevitalizeCost();
         changeMaxTransferValue();
+        timerManagement();
     };
 </script>
 <div>
@@ -82,6 +110,7 @@
     {% endwith %}
 </div>
 <form id="board" method="post" action="board">
+    <div id="round-timer" class="time-green"></div>
     <div class="game-info">
         <div class="month">{{ turn_to_month(context.board_state.turn) }}</div>
         <div class="team-vps">
