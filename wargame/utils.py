@@ -51,6 +51,23 @@ teams = ('red', 'blue')
 
 vitality_recovery_cost = [0, 1, 2, 4, 5, 6, 7]
 
+entity_id_to_name_map = {
+    'bear': 'Energetic Bear',
+    'ros': 'Rosenergoatom',
+    'rus_gov': 'Russian Government',
+    'scs': 'SCS',
+    'trolls': 'Online Trolls',
+    'elect': 'Electorate',
+    'energy': 'UK Energy',
+    'gchq': 'GCHQ',
+    'plc': 'UK PLC',
+    'uk_gov': 'UK Government',
+}
+
+
+def display_name(entity_id):
+    return entity_id_to_name_map[entity_id]
+
 
 def calculate_max_revitalization(available_resources):
     vitality_max_resource_cost = [0, 1, 2, 2, 4, 5, 6]
@@ -77,4 +94,5 @@ def helper_functions():
         current_team=current_team,
         vitality_recovery_cost=vitality_recovery_cost,
         calculate_max_revitalization=calculate_max_revitalization,
+        display_name=display_name,
     )

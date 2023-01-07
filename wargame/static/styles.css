@@ -78,8 +78,6 @@ th, td {
     width: var(--card-width);
     height: var(--card-height);
     border: 2px solid black;
-    border-top-left-radius: 10px;
-    border-top-right-radius: 10px;
 }
 
 .card:nth-of-type(1) {
@@ -140,13 +138,13 @@ th, td {
 .entity-resources {
     float: left;
     box-sizing: border-box;
-    border: 2px solid yellow;
+    border: 2px inset yellow;
 }
 
 .entity-vitality {
     float: right;
     box-sizing: border-box;
-    border: 2px solid blue;
+    border: 2px inset blue;
 }
 
 .entity-actions {
