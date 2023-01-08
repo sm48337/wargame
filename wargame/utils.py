@@ -94,7 +94,10 @@ def get_ends_of_months(*args):
 
 
 def turn_to_month(turn):
-    return f"{months[turn // 2]} / {current_team(turn).capitalize()} team's turn"
+    month = turn // 2
+    if month >= len(months):
+        return 'Game Over'
+    return f"{months[month]} / {current_team(turn).capitalize()} team's turn"
 
 
 def total_vps(team):
@@ -108,6 +111,10 @@ def turn_end(turn_start):
     return turn_start + timedelta(minutes=3)
 
 
+def waiting_for_move(context, current_user):
+    return context.board_state['turn'] % 2 == 0 and context.first_player == current_user
+
+
 def helper_functions():
     return dict(
         turn_to_month=turn_to_month,
@@ -117,4 +124,5 @@ def helper_functions():
         display_name=display_name,
         total_vps=total_vps,
         turn_end=turn_end,
+        waiting_for_move=waiting_for_move,
     )

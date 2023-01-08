@@ -72,10 +72,16 @@
                 minute: '2-digit',
                 second: '2-digit'
             };
-            display.textContent = timeLeft.toLocaleTimeString('en-us', options);
+            {% if waiting_for_move(context, current_user) %}
             if (timeLeft.getTime() <= 0) {
                 form.submit();
             }
+            {% else %}
+            if (timeLeft.getTime() <= -5000) {
+                location.reload();
+            }
+            {% endif %}
+            display.textContent = timeLeft.toLocaleTimeString('en-us', options);
             if (timeLeft.getTime() < 1 * 60 * 1000) {
                 display.classList.remove('time-green');
                 display.classList.remove('time-yellow');
@@ -89,13 +95,30 @@
         refreshTime();
     }
 
+    const refreshIfTurnOver = () => {
+        fetch('{{ url_for('game.turn_start', game_id=context.id) }}')
+            .then(resp => resp.json())
+            .then(data => {
+                const turn_start = new Date(data.start);
+                const current_time = new Date();
+                if (data.turn != {{ context.board_state.turn }} || turn_start > current_time) {
+                    location.reload();
+                }
+            });
+    };
+
     window.onload = () => {
         addClassToTargetOnHover('.attack', 'attack-target');
         addClassToTargetOnHover('.transfer', 'transfer-target');
         makeOnlySelectedOptionVisible();
         displayRevitalizeCost();
         changeMaxTransferValue();
+        {% if not context.victor %}
         timerManagement();
+            {% if not waiting_for_move(context, current_user) %}
+        setInterval(refreshIfTurnOver, 5000);
+            {% endif %}
+        {% endif %}
     };
 </script>
 <div>
@@ -110,7 +133,9 @@
     {% endwith %}
 </div>
 <form id="board" method="post" action="board">
-    <div id="round-timer" class="time-green"></div>
+    {% if not context.victor %}
+    <div id="round-timer" class="time-green">03:00</div>
+    {% endif %}
     <div class="game-info">
         <div class="month">{{ turn_to_month(context.board_state.turn) }}</div>
         <div class="team-vps">
