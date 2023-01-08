@@ -16,7 +16,7 @@
         <legend>Actions</legend>
         {% if entity.connections %}
         <div>
-            <input type="radio" id="{{ entity.id }}__transfer" name="{{ entity.id }}__action" value="transfer" autocomplete="off">
+            <input type="radio" id="{{ entity.id }}__transfer" name="{{ entity.id }}__action" value="transfer" autocomplete="off" {{ 'disabled' if current_team(context.board_state.turn) == 'blue' and context.board_state.teams.blue.entities.uk_gov.traits.banking_error }}>
             <label for="{{ entity.id }}__transfer">Transfer</label>
         </div>
         {% endif %}
@@ -24,6 +24,12 @@
         <div>
             <input type="radio" id="{{ entity.id }}__attack" name="{{ entity.id }}__action" value="attack" autocomplete="off">
             <label for="{{ entity.id }}__attack">Attack</label>
+        </div>
+        {% endif %}
+        {% if entity.id in ('scs', 'gchq') %}
+        <div>
+            <input type="radio" id="{{ entity.id }}__black_market" name="{{ entity.id }}__action" value="black_market" autocomplete="off" {{ 'disabled' if current_team(context.board_state.turn) == 'red' and context.board_state.teams.red.entities.scs.embargoed }}>
+            <label for="{{ entity.id }}__black_market">Access Black Market</label>
         </div>
         {% endif %}
         <div>

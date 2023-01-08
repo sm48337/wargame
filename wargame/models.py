@@ -8,7 +8,7 @@ from sqlalchemy.orm import relationship
 from .db import db
 from .utils import (
     attack_result_table, current_team, opposing_team, find_attack_targets, find_transfer_targets,
-    teams, vitality_recovery_cost, end_of_month, get_ends_of_months, total_vps
+    teams, vitality_recovery_cost, end_of_month, get_ends_of_months, total_vps, Event
 )
 
 
@@ -89,6 +89,9 @@ class Game(db.Model):
     def __init__(self, *args, **kwargs):
         kwargs['history'] = [kwargs['board_state']]
         super().__init__(*args, **kwargs)
+        self.message_log = list()
+        self.give_resources()
+        self.process_event()
 
     def get_current_entities(self):
         turn = self.board_state['turn']
@@ -195,7 +198,7 @@ class Game(db.Model):
             if action := inputs.get(entity['id'] + '__action'):
                 match action:
                     case '' | 'none':
-                        continue
+                        pass
                     case 'revitalize':
                         self._do_revitalize(entity, inputs)
                     case 'attack':
@@ -203,8 +206,17 @@ class Game(db.Model):
                     case 'transfer':
                         self._do_transfer(entity, inputs)
 
+            if entity['id'] == 'uk_gov' and entity['traits'].get('banking_error'):
+                entity['traits']['banking_error'] = False
+
+            if entity['id'] == 'scs' and entity['traits'].get('embargoed'):
+                entity['traits']['embargoed'] = False
+
     def give_resources(self):
         entities = self.get_current_entities()
+        if entities.get('rus_gov', {}).get('traits', {}).get('people_revolt'):
+            entities['rus_gov']['traits']['people_revolt'] = False
+            return
         gov_entity = entities.get('rus_gov') or entities.get('uk_gov')
         gov_entity['resource'] += 3
         self.message_log.append(f"{gov_entity['name']} gains 3 resources.")
@@ -336,8 +348,14 @@ class Game(db.Model):
         elif turn == end_of_month(12):
             self.determine_winner()
 
+        self.process_event()
         # end of month
         if turn % 2 == 1:
             self.calculate_victory_points()
 
         self.history.append(self.board_state)
+
+    def process_event(self):
+        event = Event(self.board_state)
+        description = event.handle()
+        self.message_log.append(description)

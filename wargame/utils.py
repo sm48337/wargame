@@ -1,7 +1,78 @@
 from datetime import timedelta
 from functools import cache
+from itertools import chain
 from json import load
+from random import choice
 from re import match
+
+
+class Event:
+
+    descriptions = {
+        "uneventful_month":     "Uneventful Month - Nothing out of the ordinary happens this month, continue playing.",
+        "nuclear_meltdown":     "Nuclear Meltdown - Hinkley Point nuclear generator suffers a small but significant technical fault. "
+                                "Uk Energy loses 1 vitality.",
+        "clumsy_civil_servant": "Clumsy Civil Servant - A Civil Servant leaves a laptop with sensitive data on a train. "
+                                "Electorate loses 1 vitality. UK Government loses 2 resource.",
+        "software_update":      "Software Update - Government mandates that all companies must have the latest operating system. "
+                                "UK PLC loses 2 resource.",
+        "banking_error":        "Banking Error - A rounding error in the Bank of England computer system cripples transfer protocols. "
+                                "UK cannot transfer any resources this month.",
+        "embargoed":            "Embargoed - Russian foreign policy adventurism results in an international arms embargo. "
+                                "SCS cannot bid on or receive Black Market items this month.",
+        "lax_opsec":            "Lax OpSec - An Interior Ministry worker plugs in an unsanitised USB stick. "
+                                "Russia Government loses 1 vitality and 1 resource.",
+        "people_revolt":        "People's Revolt - People take to the streets to protest against Internet censorship. "
+                                "Russia does not gain any resource this month.",
+        "quantum_breakthrough": "Quantum Breakthrough - Google rolls out quantum computing across its services and devices. "
+                                "ALL entities gain 1 resource and 1 vitality.",
+    }
+
+    def __init__(self, board_state):
+        teams = board_state['teams']
+        self.red_team = teams['red']['entities']
+        self.blue_team = teams['blue']['entities']
+
+    @staticmethod
+    def events():
+        return (*("uneventful_month",) * 8, "nuclear_meltdown", "clumsy_civil_servant", "software_update",
+                "banking_error", "embargoed", "lax_opsec", "people_revolt", "quantum_breakthrough")
+
+    def uneventful_month(self):
+        pass
+
+    def nuclear_meltdown(self):
+        self.blue_team['energy']['vitality'] -= 1
+
+    def clumsy_civil_servant(self):
+        self.blue_team['elect']['vitality'] -= 1
+        self.blue_team['uk_gov']['resource'] -= 2
+
+    def software_update(self):
+        self.blue_team['plc']['resource'] -= 2
+
+    def banking_error(self):
+        self.blue_team['uk_gov']['traits']['banking_error'] = True
+
+    def embargoed(self):
+        self.red_team['scs']['traits']['embargoed'] = True
+
+    def lax_opsec(self):
+        self.red_team['rus_gov']['vitality'] -= 1
+        self.red_team['rus_gov']['resource'] -= 1
+
+    def people_revolt(self):
+        self.red_team['rus_gov']['traits']['people_revolt'] = True
+
+    def quantum_breakthrough(self):
+        for entity in chain(self.red_team.values(), self.blue_team.values()):
+            entity['resource'] += 1
+            entity['vitality'] += 1
+
+    def handle(self):
+        event = choice(self.events())
+        getattr(self, event)()
+        return self.descriptions[event]
 
 
 @cache
