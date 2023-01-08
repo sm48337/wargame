@@ -11,7 +11,7 @@
         Vitality - {{ entity.vitality }}
     </div>
 </div>
-<div class="entity-actions {{ 'active' if current_team(context.board_state['turn']) == team and current_user == context[team + '_player']}}">
+<div class="entity-actions {{ 'active' if current_team(context.board_state['turn']) == team and can_play_with_entity(context[team + '_team'], current_user, entity.id) }}">
     <fieldset>
         <legend>Actions</legend>
         {% if entity.connections %}

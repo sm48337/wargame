@@ -3,8 +3,8 @@ from datetime import datetime, timedelta
 from flask import Blueprint, flash, render_template, request, redirect, url_for
 from flask_login import login_required
 
-from .models import db, User, Game
-from .utils import get_initial_board_state
+from .models import db, User, Game, Team
+from .utils import get_initial_board_state, entity_ids_by_team, entity_types
 
 bp = Blueprint('game', __name__, url_prefix='/game')
 
@@ -13,6 +13,14 @@ bp = Blueprint('game', __name__, url_prefix='/game')
 @login_required
 def home():
     return render_template('home.html')
+
+
+def form_team(team):
+    new_team = Team()
+    new_team.name = request.form.get(f'{team}-team-name')
+    for entity_id, entity_type in zip(entity_ids_by_team[team], entity_types):
+        setattr(new_team, entity_type + '_player', User.query.get(request.form.get(entity_id)))
+    return new_team
 
 
 @bp.route('/new', methods=['GET', 'POST'])
@@ -24,11 +32,12 @@ def new():
         }
         return render_template('new.html', context=context)
 
-    red_player = User.query.get(request.form.get('red_player'))
-    blue_player = User.query.get(request.form.get('blue_player'))
+    red_team = form_team('red')
+    blue_team = form_team('blue')
+    description = request.form.get('description')
     state = get_initial_board_state()
 
-    new_game = Game(red_player=red_player, blue_player=blue_player, board_state=state)
+    new_game = Game(red_team=red_team, blue_team=blue_team, board_state=state, description=description)
     db.session.add(new_game)
     db.session.commit()
 

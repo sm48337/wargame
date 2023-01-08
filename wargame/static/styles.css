@@ -23,6 +23,19 @@ body {
     padding: 5px;
 }
 
+#game fieldset {
+    width: fit-content;
+    margin: auto;
+}
+
+.entity-player-picker > label {
+    text-align: left;
+}
+
+.entity-player-picker > select {
+    text-align: right;
+}
+
 #home {
     text-align: center;
     padding: 5px;

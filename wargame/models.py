@@ -33,24 +33,57 @@ class User(db.Model, UserMixin):
         id, username = self.id, self.username
         return f'<User {id=} {username=}>'
 
+    def _all_roles_query(self):
+        return or_(Team.government_player == self,
+                   Team.industry_player == self,
+                   Team.people_player == self,
+                   Team.security_player == self,
+                   Team.energy_player == self)
+
     @property
     def games(self):
-        return Game.query.filter(or_(Game.red_player == self, Game.blue_player == self)).all()
+        return Game.query.join(
+            Team, or_(Team.id == Game.red_team_id,
+                      Team.id == Game.blue_team_id)
+        ).where(self._all_roles_query()).all()
+
+
+class Team(db.Model):
+    __tablename__ = 'team'
+
+    id = Column(Integer, primary_key=True)
+    name = Column(String, nullable=False)
+    government_player_id = Column(ForeignKey('user.id'), nullable=False)
+    government_player = relationship('User', foreign_keys=[government_player_id])
+    industry_player_id = Column(ForeignKey('user.id'), nullable=False)
+    industry_player = relationship('User', foreign_keys=[industry_player_id])
+    people_player_id = Column(ForeignKey('user.id'), nullable=False)
+    people_player = relationship('User', foreign_keys=[people_player_id])
+    security_player_id = Column(ForeignKey('user.id'), nullable=False)
+    security_player = relationship('User', foreign_keys=[security_player_id])
+    energy_player_id = Column(ForeignKey('user.id'), nullable=False)
+    energy_player = relationship('User', foreign_keys=[energy_player_id])
+
+    @property
+    def players(self):
+        return (self.government_player, self.industry_player, self.people_player, self.security_player, self.energy_player)
 
 
 class Game(db.Model):
     __tablename__ = 'game'
 
     id = Column(Integer, primary_key=True)
-    red_player_id = Column(ForeignKey('user.id'), nullable=False)
-    red_player = relationship('User', foreign_keys=[red_player_id])
-    blue_player_id = Column(ForeignKey('user.id'), nullable=False)
-    blue_player = relationship('User', foreign_keys=[blue_player_id])
+    red_team_id = Column(ForeignKey('team.id'), nullable=False)
+    red_team = relationship('Team', foreign_keys=[red_team_id])
+    blue_team_id = Column(ForeignKey('team.id'), nullable=False)
+    blue_team = relationship('Team', foreign_keys=[blue_team_id])
+    victor_id = Column(ForeignKey('team.id'), nullable=True)
+    victor = relationship('Team', foreign_keys=[victor_id])
+
+    description = Column(String)
     board_state = Column(MutableDict.as_mutable(JSON))
     history = Column(MutableList.as_mutable(JSON), default=list)
     message_log = Column(MutableList.as_mutable(JSON), default=list)
-    victor_id = Column(ForeignKey('user.id'), nullable=True)
-    victor = relationship('User', foreign_keys=[victor_id])
     turn_start = Column(DateTime, default=datetime.now)
 
     def __init__(self, *args, **kwargs):
@@ -186,8 +219,8 @@ class Game(db.Model):
         teams = self.board_state['teams']
         red_vps = total_vps(teams['red'])
         blue_vps = total_vps(teams['blue'])
-        self.victor = self.red_player if red_vps > blue_vps else self.blue_player
-        self.message_log.append(f'Player {self.victor.username} won the game having {red_vps} VPs. The opponent had {blue_vps} VPs.')
+        self.victor = self.red_team if red_vps > blue_vps else self.blue_team
+        self.message_log.append(f'Team {self.victor.name} won the game having {red_vps} VPs. The opposing team had {blue_vps} VPs.')
 
     def enable_attacks(self):
         self.message_log.append('Attacks enabled.')

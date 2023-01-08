@@ -9,18 +9,18 @@
     <table>
         <tr>
             <th>Game ID</th>
-            <th>Red player</th>
-            <th>Blue player</th>
+            <th>Red team</th>
+            <th>Blue team</th>
             <th>Winner</th>
             <th>Link</th>
         </tr>
         {% for game in current_user.games %}
         <tr>
             <td>{{ game.id }}</td>
-            <td>{{ game.red_player.username }}</td>
-            <td>{{ game.blue_player.username }}</td>
+            <td>{{ game.red_team.name }}</td>
+            <td>{{ game.blue_team.name }}</td>
             {% if game.victor %}
-            <td>{{ game.victor.username }}</td>
+            <td>{{ game.victor.name }}</td>
             {% else %}
             <td><i>Game still in progress</i></td>
             {% endif %}

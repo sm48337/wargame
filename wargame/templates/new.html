@@ -3,21 +3,32 @@
 {% block content %}
 
 <form id="game" method="post" action="new">
+    {% for team in teams %}
     <div>
-        <label for="red_player">Red player:</label>
-        <select name="red_player" id="red_player">
-            {% for player in context.players %}
-            <option value="{{ player.id }}">{{ player.username }}</option>
+        <fieldset id="create-{{ team }}-team">
+            <legend>{{ team.capitalize() }} Team</legend>
+            <label for="{{ team }}-team-name">Team name:</label>
+            <input type="text" id="{{ team }}-team-name" name="{{ team }}-team-name" required>
+            {% for entity_id in entity_ids_by_team[team] %}
+            <div class="entity-player-picker">
+                <label for="{{ entity_id }}">{{ display_name(entity_id) }} player:</label>
+                <div>
+                    <select name="{{ entity_id }}" id="{{ entity_id }}">
+                        {% for player in context.players %}
+                        <option value="{{ player.id }}">{{ player.username }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+            </div>
             {% endfor %}
-        </select>
+        </fieldset>
     </div>
+    {% endfor %}
     <div>
-        <label for="blue_player">Blue player:</label>
-        <select name="blue_player" id="blue_player">
-            {% for player in context.players %}
-            <option value="{{ player.id }}">{{ player.username }}</option>
-            {% endfor %}
-        </select>
+        <div>
+            <label for="description">Game description (optional):</label>
+        </div>
+        <textarea id="description" name="description" cols=40 rows=10></textarea>
     </div>
     <div>
         <input type="submit" value="Create game" class="create-game-btn">

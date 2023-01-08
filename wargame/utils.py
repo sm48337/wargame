@@ -52,6 +52,16 @@ teams = ('red', 'blue')
 
 vitality_recovery_cost = [0, 1, 2, 4, 5, 6, 7]
 
+# Ordered by type
+entity_ids_by_team = {
+    'red': ('rus_gov', 'bear', 'trolls', 'scs', 'ros'),
+    'blue': ('uk_gov', 'plc', 'elect', 'gchq', 'energy'),
+}
+
+entity_types = (
+    'government', 'industry', 'people', 'security', 'energy'
+)
+
 entity_id_to_name_map = {
     'bear': 'Energetic Bear',
     'ros': 'Rosenergoatom',
@@ -112,7 +122,26 @@ def turn_end(turn_start):
 
 
 def waiting_for_move(context, current_user):
-    return context.board_state['turn'] % 2 == 0 and context.red_player == current_user
+    return context.board_state['turn'] % 2 == 0 and current_user in context.red_team.players
+
+
+entity_type_mapping = {
+    'uk_gov': 'government',
+    'rus_gov': 'government',
+    'plc': 'industry',
+    'bear': 'industry',
+    'scs': 'security',
+    'gchq': 'security',
+    'trolls': 'people',
+    'elect': 'people',
+    'energy': 'energy',
+    'ros': 'energy',
+}
+
+
+def can_play_with_entity(team, player, entity):
+    entity_type = entity_type_mapping[entity]
+    return player == getattr(team, entity_type + '_player')
 
 
 def helper_functions():
@@ -125,4 +154,7 @@ def helper_functions():
         total_vps=total_vps,
         turn_end=turn_end,
         waiting_for_move=waiting_for_move,
+        teams=teams,
+        entity_ids_by_team=entity_ids_by_team,
+        can_play_with_entity=can_play_with_entity,
     )
