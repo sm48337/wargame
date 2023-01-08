@@ -160,7 +160,7 @@ th, td {
     z-index: 100;
 }
 
-.card:hover .entity-actions {
+.card:hover .entity-actions.active {
     display: block;
 }
 

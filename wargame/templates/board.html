@@ -145,13 +145,11 @@
     {% for team in context.board_state.teams %}
     <div id="{{ team }}">
         <div class="core">
-            <div class="triangle">
-                {% for entity in context.board_state.teams[team].entities.values() %}
-                <div class="card" id={{ entity.id }}>
-                    {% include 'entity.html' %}
-                </div>
-                {% endfor %}
+            {% for entity in context.board_state.teams[team].entities.values() %}
+            <div class="card" id={{ entity.id }}>
+                {% include 'entity.html' %}
             </div>
+            {% endfor %}
         </div>
     </div>
     {% endfor %}
