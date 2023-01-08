@@ -24,11 +24,11 @@ def new():
         }
         return render_template('new.html', context=context)
 
-    first_player = User.query.get(request.form.get('first_player'))
-    second_player = User.query.get(request.form.get('second_player'))
+    red_player = User.query.get(request.form.get('red_player'))
+    blue_player = User.query.get(request.form.get('blue_player'))
     state = get_initial_board_state()
 
-    new_game = Game(first_player=first_player, second_player=second_player, board_state=state)
+    new_game = Game(red_player=red_player, blue_player=blue_player, board_state=state)
     db.session.add(new_game)
     db.session.commit()
 

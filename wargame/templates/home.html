@@ -17,8 +17,8 @@
         {% for game in current_user.games %}
         <tr>
             <td>{{ game.id }}</td>
-            <td>{{ game.first_player.username }}</td>
-            <td>{{ game.second_player.username }}</td>
+            <td>{{ game.red_player.username }}</td>
+            <td>{{ game.blue_player.username }}</td>
             {% if game.victor %}
             <td>{{ game.victor.username }}</td>
             {% else %}

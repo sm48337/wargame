@@ -35,17 +35,17 @@ class User(db.Model, UserMixin):
 
     @property
     def games(self):
-        return Game.query.filter(or_(Game.first_player == self, Game.second_player == self)).all()
+        return Game.query.filter(or_(Game.red_player == self, Game.blue_player == self)).all()
 
 
 class Game(db.Model):
     __tablename__ = 'game'
 
     id = Column(Integer, primary_key=True)
-    first_player_id = Column(ForeignKey('user.id'), nullable=False)
-    first_player = relationship('User', foreign_keys=[first_player_id])
-    second_player_id = Column(ForeignKey('user.id'), nullable=False)
-    second_player = relationship('User', foreign_keys=[second_player_id])
+    red_player_id = Column(ForeignKey('user.id'), nullable=False)
+    red_player = relationship('User', foreign_keys=[red_player_id])
+    blue_player_id = Column(ForeignKey('user.id'), nullable=False)
+    blue_player = relationship('User', foreign_keys=[blue_player_id])
     board_state = Column(MutableDict.as_mutable(JSON))
     history = Column(MutableList.as_mutable(JSON), default=list)
     message_log = Column(MutableList.as_mutable(JSON), default=list)
@@ -186,7 +186,7 @@ class Game(db.Model):
         teams = self.board_state['teams']
         red_vps = total_vps(teams['red'])
         blue_vps = total_vps(teams['blue'])
-        self.victor = self.first_player if red_vps > blue_vps else self.second_player
+        self.victor = self.red_player if red_vps > blue_vps else self.blue_player
         self.message_log.append(f'Player {self.victor.username} won the game having {red_vps} VPs. The opponent had {blue_vps} VPs.')
 
     def enable_attacks(self):

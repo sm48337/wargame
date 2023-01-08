@@ -4,16 +4,16 @@
 
 <form id="game" method="post" action="new">
     <div>
-        <label for="first_player">First player:</label>
-        <select name="first_player" id="first_player">
+        <label for="red_player">Red player:</label>
+        <select name="red_player" id="red_player">
             {% for player in context.players %}
             <option value="{{ player.id }}">{{ player.username }}</option>
             {% endfor %}
         </select>
     </div>
     <div>
-        <label for="second_player">Second player:</label>
-        <select name="second_player" id="second_player">
+        <label for="blue_player">Blue player:</label>
+        <select name="blue_player" id="blue_player">
             {% for player in context.players %}
             <option value="{{ player.id }}">{{ player.username }}</option>
             {% endfor %}

@@ -112,7 +112,7 @@ def turn_end(turn_start):
 
 
 def waiting_for_move(context, current_user):
-    return context.board_state['turn'] % 2 == 0 and context.first_player == current_user
+    return context.board_state['turn'] % 2 == 0 and context.red_player == current_user
 
 
 def helper_functions():
