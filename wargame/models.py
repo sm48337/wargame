@@ -275,10 +275,10 @@ class Game(db.Model):
                 self.message_log.append(f'Grow capacity - UK Energy gains {amount_won} VP because has more than {limit} vitality.')
 
     @staticmethod
-    def _count_assets(team):
+    def _count_assets(team, asset_type):
         count = 0
         for entity in team['entities'].values():
-            count += len(entity['traits'].get('assets', []))
+            count += len(list(filter(lambda a: a['type'] == asset_type, entity['traits'].get('assets', []))))
         return count
 
     def calculate_red_victory_points(self, turn, entities):
@@ -298,7 +298,7 @@ class Game(db.Model):
                 bear['victory_points'] += amount_won
                 self.message_log.append(f"Those who can't steal - Energetic Bear gains {amount_won} VP because it achieved vitality growth since last check.")
 
-        if self._count_assets(self.board_state['teams']['blue']) < self._count_assets(self.board_state['teams']['red']):
+        if self._count_assets(self.board_state['teams']['blue'], 'defence') < self._count_assets(self.board_state['teams']['red'], 'attack'):
             entities['scs']['victory_points'] += 2
             self.message_log.append('Win the arms race - SCS gains 2 VPs because Russia has a better cyber arsenal than the UK.')
 
