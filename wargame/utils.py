@@ -210,6 +210,86 @@ entity_type_mapping = {
 }
 
 
+class Asset:
+
+    assets = {
+        "attack_vector":    ('Attack Vector', 'attack', "Opens up one of the following attack vectors: GCHQ - Rosenergoatom, SCS - UK Energy, UK Government - Russia Government.",
+                             ('gchq', 'scs', 'uk_gov')),
+        "education":        ('Education', 'defensive', "Electorate suffers only half of any damage it receives for the next 3 turns.", ()),
+        "recovery":         ('Recovery Management', 'defensive', "At the end of a turn, if UK PLC has sufferred any damage, they receive +1 vitality.", ()),
+        "software_update":  ('Software Update', 'defensive', "Renders UK PLC or UK Energy or Rosenergoatom immune to direct attack for 2 turns.", ('plc', 'energy', 'ros')),
+        "bargaining_chip":  ('Bargaining Chip', 'defensive', "Russia Government suffers only half of any damage it receives for the next 3 turns.", ()),
+        "network_policy":   ('Network Policy', 'defensive', "Renders entity immune from splash damage, but only 2 resource can be transferred to or from it each turn.",
+                             (entity_id_to_name_map.keys())),
+        "stuxnet":          ('Stuxnet 2.0', 'attack', "Direct attack from GCHQ/SCS deals double damage to UK Energy or Rosenergoatom.", ('gchq', 'scs')),
+        "ransomware":       ('Ransomware', 'attack', "When part of successful direct attack, paralyses UK PLC or Electorate for 2 turns unless 2 resource is paid to attacker.",
+                             ('plc', 'elect')),
+        "cyber_investment": ('Cyber Investment Programme', 'defensive', "Entity may regenerate vitality at 1 less resource cost than normal.", (entity_id_to_name_map.keys())),
+    }
+
+    def __init__(self, board_state):
+        teams = board_state['teams']
+        self.red_team = teams['red']['entities']
+        self.blue_team = teams['blue']['entities']
+
+    @classmethod
+    def get_assets(cls, asset_ids):
+        for asset_id in asset_ids:
+            yield cls.assets[asset_id]
+
+    def attack_vector(self, option):
+        if option == 0:
+            self.blue_team['gchq']['attacks'] = ['ros']
+        elif option == 1:
+            self.red_team['scs']['attacks'] = ['energy']
+        elif option == 2:
+            self.blue_team['uk_gov']['attacks'] = ['rus_gov']
+
+    def education(self, _):
+        self.blue_team['elect']['traits']['education'] = 3
+
+    def recovery(self, _):
+        self.blue_team['plc']['traits']['recovery'] = self.blue_team['plc']['vitality']
+
+    def software_update(self, option):
+        if option == 0:
+            self.blue_team['plc']['traits']['software_update'] = 2
+        elif option == 1:
+            self.blue_team['energy']['traits']['software_update'] = 2
+        elif option == 2:
+            self.red_team['ros']['traits']['software_update'] = 2
+
+    def bargaining_chip(self, _):
+        self.red_team['rus_gov']['traits']['bargaining_chip'] = 3
+
+    def network_policy(self, option):
+        for entity in chain(self.red_team.values(), self.blue_team.values()):
+            if entity == option:
+                entity['traits']['network_policy'] = True
+                break
+
+    def stuxnet(self, option):
+        if option == 0:
+            self.red_team['ros']['traits']['stuxnet'] = True
+        elif option == 1:
+            self.blue_team['energy']['traits']['stuxnet'] = True
+
+    def ransomware(self, option):
+        for entity in self.blue_team.values():
+            if entity == option:
+                entity['traits']['ransomware'] = True
+                break
+
+    def cyber_investment(self, option):
+        for entity in chain(self.red_team.values(), self.blue_team.values()):
+            if entity == option:
+                entity['traits']['cyber_investment'] = True
+                break
+
+    def resolve(self, asset_id, option=None):
+        getattr(self, asset_id)(option)
+
+
 def can_play_with_entity(team, player, entity):
     entity_type = entity_type_mapping[entity]
     return player == getattr(team, entity_type + '_player')
@@ -228,4 +308,5 @@ def helper_functions():
         teams=teams,
         entity_ids_by_team=entity_ids_by_team,
         can_play_with_entity=can_play_with_entity,
+        get_assets=Asset.get_assets,
     )

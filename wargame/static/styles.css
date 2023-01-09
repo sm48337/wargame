@@ -221,6 +221,28 @@ th, td {
     --highlight-color: red;
 }
 
+#open-assets {
+    position: absolute;
+    left: 30px;
+    padding: 5px;
+    z-index: 1000;
+}
+
+#assets {
+    margin-top: 5%;
+    height: 60%;
+}
+
+.asset {
+    border: 2px solid black;
+    padding: 2px;
+    margin: 2px;
+}
+
+.activated-asset {
+    color: darkgray;
+}
+
 .game-info > div {
     position: absolute;
     right: 30px;

@@ -5,7 +5,7 @@
     const addClassToTargetOnHover = (selector, className) => {
         const selected = document.querySelectorAll(selector);
         selected.forEach(source => {
-            const target = document.querySelector('#' + source.attributes.target.value);
+            const target = document.getElementById(source.attributes.target.value);
             source.addEventListener('mouseenter', () => {
                 target.classList.add(className);
             });
@@ -63,9 +63,9 @@
     };
 
     const timerManagement = () => {
-        const display = document.querySelector('#round-timer');
+        const display = document.getElementById('round-timer');
         const roundEnd = new Date("{{ turn_end(context.turn_start) }}");
-        const form = document.querySelector('#board');
+        const form = document.getElementById('board');
         const refreshTime = () => {
             const timeLeft = new Date(roundEnd - new Date());
             const options = {
@@ -107,6 +107,29 @@
             });
     };
 
+    const handleAssetsDialog = () => {
+        const showButton = document.getElementById('open-assets');
+        const assetsDialog = document.getElementById('assets');
+        const closeDialog = document.getElementById('close-assets');
+        const useButtons = document.querySelectorAll('.use-asset-btn');
+        const activatedAssets = document.getElementById('activated-assets');
+
+        showButton.addEventListener('click', () => assetsDialog.showModal());
+        closeDialog.addEventListener('click', e => {
+            assetsDialog.close();
+            e.preventDefault();
+        });
+        useButtons.forEach(btn => btn.addEventListener('click', () => {
+            const assetIndex = btn.dataset.id;
+            btn.parentNode.classList.add('activated-asset');
+            if (activatedAssets.value) {
+                activatedAssets.value += ', '
+            }
+            activatedAssets.value += assetIndex;
+            btn.disabled = true;
+        }));
+    };
+
     window.onload = () => {
         addClassToTargetOnHover('.attack', 'attack-target');
         addClassToTargetOnHover('.transfer', 'transfer-target');
@@ -119,6 +142,7 @@
         setInterval(refreshIfTurnOver, 5000);
             {% endif %}
         {% endif %}
+        handleAssetsDialog();
     };
 </script>
 <div>
@@ -133,6 +157,9 @@
     {% endwith %}
 </div>
 <form id="board" method="post" action="board">
+    {% with assets = context.board_state.teams[current_team(context.board_state['turn'])]['assets'] %}
+    {% include 'assets.html' %}
+    {% endwith %}
     {% if not context.victor %}
     <div id="round-timer" class="time-green">03:00</div>
     {% endif %}

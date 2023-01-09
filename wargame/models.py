@@ -8,7 +8,7 @@ from sqlalchemy.orm import relationship
 from .db import db
 from .utils import (
     attack_result_table, current_team, opposing_team, find_attack_targets, find_transfer_targets,
-    teams, vitality_recovery_cost, end_of_month, get_ends_of_months, total_vps, Event
+    teams, vitality_recovery_cost, end_of_month, get_ends_of_months, total_vps, Event, Asset
 )
 
 
@@ -144,16 +144,54 @@ class Game(db.Model):
 
     def _do_damage(self, target_id, amount, target_team):
         connections, target = self.get_all_connections(target_id, target_team)
-        target['vitality'] -= amount
+
+        direct_amount = amount
+        if target['traits'].get('software_update'):
+            direct_amount = 0
+        if target['traits'].get('stuxnet'):
+            direct_amount *= 2
+        if target['traits'].get('education') or target['traits'].get('bargaining_chip'):
+            direct_amount //= 2
+        if target['traits']['ransomware']:
+            target['traits']['paralyzed'] = 3
+
+        target['vitality'] -= direct_amount
         self._entity_destroyed_check(target, target_team)
 
         for connection in connections.values():
-            connection['vitality'] -= amount // 2
+            if connection['traits'].get('education'):
+                connection['vitality'] -= amount // 4
+            elif connection['traits'].get('network_policy'):
+                pass
+            else:
+                connection['vitality'] -= amount // 2
             self._entity_destroyed_check(connection, target_team)
         self.message_log.append(f"{target['name']} was dealt {amount} damage. Connected entities got {amount // 2} damage.")
 
-    def _do_attribution(self):
-        ...
+    def _do_attribution(self, attacker, level):
+        if attacker == 'bear':
+            self.board_state['teams']['blue']['assets'].append('software_update')
+            if level == -2:
+                self.board_state['teams']['blue']['assets'].append('recovery')
+        elif attacker == 'trolls':
+            self.board_state['teams']['blue']['assets'].append('education')
+            if level == -2:
+                self.board_state['teams']['red']['trolls']['traits']['cannot_attack'] = 2
+        elif attacker == 'scs':
+            self.board_state['teams']['blue']['assets'].append('software_update')
+            self.board_state['teams']['red']['scs']['traits']['cannot_bit'] = 2
+            if level == -2:
+                self.board_state['teams']['blue']['assets'].append('attack_vector')
+        elif attacker == 'gchq':
+            self.board_state['teams']['blue']['gchq']['traits']['cannot_attack'] = 2
+            if level == -2:
+                self.board_state['teams']['blue']['gchq']['traits']['cannot_perform_actions'] = 2
+                self.board_state['teams']['blue']['uk_gov']['vitality'] -= 1
+        elif attacker == 'uk_gov':
+            self.board_state['teams']['red']['assets'].append('bargaining_chip')
+            if level == -2:
+                self.board_state['teams']['blue']['uk_gov']['resource'] -= 2
+                self.board_state['teams']['blue']['uk_gov']['vitality'] -= 2
 
     def _do_attack(self, entity, inputs):
         turn = self.board_state['turn']
@@ -167,7 +205,7 @@ class Game(db.Model):
                 self._do_damage(target_id, attack_success, opposing_team(turn))
             elif attack_success < 0:
                 self._do_damage(entity['id'], -attack_success, current_team(turn))
-                self._do_attribution()
+                self._do_attribution(entity['id'], -attack_success)
 
             entity['resource'] -= attack_investment
             if entity['id'] == 'trolls':
@@ -194,6 +232,20 @@ class Game(db.Model):
                     self.message_log.append(f"Resist the drain - {entity['name']} lost 1 VP due to the transfer of resources.")
 
     def process_inputs(self, inputs):
+        teams = self.board_state['teams']
+        team = teams[current_team(self.board_state['turn'])]
+        asset = Asset(self.board_state)
+        if activated_assets := inputs.get('activated-assets'):
+            activated_asset_ids = map(int, activated_assets.split(', '))
+            used_assets = list()
+            for index in activated_asset_ids:
+                asset.resolve(team['assets'][index], inputs.get('option-' + str(index), ''))
+                used_assets.append(index)
+
+            used_assets.sort(reverse=True)
+            for index in used_assets:
+                del team['assets'][index]
+
         for entity in self.get_current_entities().values():
             if action := inputs.get(entity['id'] + '__action'):
                 match action:
@@ -211,6 +263,32 @@ class Game(db.Model):
 
             if entity['id'] == 'scs' and entity['traits'].get('embargoed'):
                 entity['traits']['embargoed'] = False
+
+        for t, e, trait in (
+                ('blue', 'elect', 'education'), ('red', 'rus_gov', 'bargaining_chip'),
+                ('blue', 'plc', 'software_update'), ('blue', 'energy', 'software_update'), ('red', 'ros', 'software_update'),
+                ):
+            entity = teams[t]['entities'][e]
+            if entity['traits'].get(trait):
+                entity['traits'][trait] -= 1
+
+        plc = teams['blue']['entities']['plc']
+        if recovery := plc['traits'].get('recovery'):
+            if plc['vitality'] < recovery:
+                plc['vitality'] += 1
+            plc['traits']['recovery'] = plc['vitality']
+
+        for t, e in ('blue', 'energy'), ('red', 'ros'):
+            entity = teams[t]['entities'][e]
+            if entity['traits'].get('stuxnet'):
+                entity['traits']['stuxnet'] = False
+
+        for e in 'plc', 'elect':
+            entity = teams['blue']['entities'][e]
+            if entity['traits'].get('ransomware'):
+                entity['traits']['ransomware'] = False
+            if entity['traits'].get('paralyzed'):
+                entity['traits']['paralyzed'] -= 1
 
     def give_resources(self):
         entities = self.get_current_entities()
@@ -287,11 +365,8 @@ class Game(db.Model):
                 self.message_log.append(f'Grow capacity - UK Energy gains {amount_won} VP because has more than {limit} vitality.')
 
     @staticmethod
-    def _count_assets(team, asset_type):
-        count = 0
-        for entity in team['entities'].values():
-            count += len(list(filter(lambda a: a['type'] == asset_type, entity['traits'].get('assets', []))))
-        return count
+    def _count_assets_of_type(assets, asset_type):
+        return len(list(filter(lambda a: a[1] == asset_type, Asset.get_assets(assets))))
 
     def calculate_red_victory_points(self, turn, entities):
         if entities['rus_gov']['resource'] >= 3:
@@ -310,7 +385,7 @@ class Game(db.Model):
                 bear['victory_points'] += amount_won
                 self.message_log.append(f"Those who can't steal - Energetic Bear gains {amount_won} VP because it achieved vitality growth since last check.")
 
-        if self._count_assets(self.board_state['teams']['blue'], 'defence') < self._count_assets(self.board_state['teams']['red'], 'attack'):
+        if self._count_assets_of_type(self.board_state['teams']['blue']['assets'], 'defence') < self._count_assets_of_type(self.board_state['teams']['red']['assets'], 'attack'):
             entities['scs']['victory_points'] += 2
             self.message_log.append('Win the arms race - SCS gains 2 VPs because Russia has a better cyber arsenal than the UK.')
 
