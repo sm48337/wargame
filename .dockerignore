@@ -1,0 +1,8 @@
+.git
+.gitignore
+Makefile
+__pycache__
+*.pyc
+.venv
+secret_key
+wargame/database.db
