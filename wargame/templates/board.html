@@ -67,7 +67,9 @@
         const roundEnd = new Date("{{ turn_end(context.turn_start) }}");
         const form = document.getElementById('board');
         const refreshTime = () => {
-            const timeLeft = new Date(roundEnd - new Date());
+            const now = new Date();
+            const utc = new Date(now.getTime() + now.getTimezoneOffset() * 60000);
+            const timeLeft = new Date(roundEnd - utc);
             const options = {
                 minute: '2-digit',
                 second: '2-digit'
