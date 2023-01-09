@@ -6,7 +6,7 @@ from flask_login import login_required
 from .models import db, User, Game, Team
 from .utils import get_initial_board_state, entity_ids_by_team, entity_types
 
-bp = Blueprint('game', __name__, url_prefix='/game')
+bp = Blueprint('game', __name__, url_prefix='/')
 
 
 @bp.route('/')
@@ -23,7 +23,7 @@ def form_team(team):
     return new_team
 
 
-@bp.route('/new', methods=['GET', 'POST'])
+@bp.route('game/new', methods=['GET', 'POST'])
 @login_required
 def new():
     if request.method == 'GET':
@@ -44,7 +44,7 @@ def new():
     return redirect(url_for('game.board', game_id=new_game.id))
 
 
-@bp.route('/<int:game_id>/turn_start')
+@bp.route('game/<int:game_id>/turn_start')
 @login_required
 def turn_start(game_id):
     game = Game.query.get_or_404(game_id)
@@ -54,7 +54,7 @@ def turn_start(game_id):
     }
 
 
-@bp.route('/<int:game_id>/board', methods=['GET', 'POST'])
+@bp.route('game/<int:game_id>/board', methods=['GET', 'POST'])
 @login_required
 def board(game_id):
     game = Game.query.get_or_404(game_id)
