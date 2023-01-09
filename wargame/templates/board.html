@@ -132,6 +132,30 @@
         }));
     };
 
+    const handleBlackMarket = () => {
+        const scsOpen = document.getElementById('scs__black_market');
+        const gchqOpen = document.getElementById('gchq__black_market');
+        const marketDialog = document.getElementById('black-market');
+        const cancelDialog = document.getElementById('cancel-bm');
+        const confirmDialog = document.getElementById('confirm-bm');
+
+        const openFunction = () => {
+            marketDialog.showModal();
+        };
+        scsOpen.addEventListener('change', openFunction);
+        gchqOpen.addEventListener('change', openFunction);
+        cancelDialog.addEventListener('click', e => {
+            marketDialog.close();
+            e.preventDefault();
+        });
+        confirmDialog.addEventListener('click', e => {
+            marketDialog.close();
+            scsOpen.parentNode.parentNode.parentNode.classList.remove('active');
+            gchqOpen.parentNode.parentNode.parentNode.classList.remove('active');
+            e.preventDefault();
+        });
+    };
+
     window.onload = () => {
         addClassToTargetOnHover('.attack', 'attack-target');
         addClassToTargetOnHover('.transfer', 'transfer-target');
@@ -145,6 +169,7 @@
             {% endif %}
         {% endif %}
         handleAssetsDialog();
+        handleBlackMarket();
     };
 </script>
 <div>
@@ -162,6 +187,7 @@
     {% with assets = context.board_state.teams[current_team(context.board_state['turn'])]['assets'] %}
     {% include 'assets.html' %}
     {% endwith %}
+    {% include 'black_market.html' %}
     {% if not context.victor %}
     <div id="round-timer" class="time-green">03:00</div>
     {% endif %}
