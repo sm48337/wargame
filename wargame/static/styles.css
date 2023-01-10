@@ -173,7 +173,7 @@ th, td {
     z-index: 100;
 }
 
-.card:hover .entity-actions.active {
+.card:hover .entity-actions {
     display: block;
 }
 

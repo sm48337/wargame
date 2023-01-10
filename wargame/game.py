@@ -1,7 +1,7 @@
 from datetime import datetime, timedelta, timezone
 
 from flask import Blueprint, flash, render_template, request, redirect, url_for
-from flask_login import login_required
+from flask_login import login_required, current_user
 
 from .models import db, User, Game, Team
 from .utils import get_initial_board_state, entity_ids_by_team, entity_types
@@ -60,17 +60,18 @@ def board(game_id):
     game = Game.query.get_or_404(game_id)
 
     if request.method == 'POST':
-        if errors := game.perform_checks(request.form):
+        if errors := game.perform_checks(request.form, current_user):
             for message, category in errors:
                 flash(message, category)
             return redirect(url_for('game.board', game_id=game.id))
 
+        game.ready_player(current_user)
         game.process_turn(request.form)
         db.session.commit()
         return redirect(url_for('game.board', game_id=game.id))
 
     elif (game.turn_start_utc + timedelta(minutes=3, seconds=5)) < datetime.now(timezone.utc):
-        game.process_turn(dict())
+        game.process_turn(dict(), timeout=True)
         db.session.commit()
 
     return render_template('board.html', context=game)

@@ -81,6 +81,8 @@ class Game(db.Model):
     victor = relationship('Team', foreign_keys=[victor_id])
 
     description = Column(String)
+    ready_players = Column(MutableList.as_mutable(JSON), default=list)
+    player_inputs = Column(MutableDict.as_mutable(JSON), default=dict)
     board_state = Column(MutableDict.as_mutable(JSON))
     history = Column(MutableList.as_mutable(JSON), default=list)
     message_log = Column(MutableList.as_mutable(JSON), default=list)
@@ -106,6 +108,18 @@ class Game(db.Model):
     def turn_start_utc(self):
         return self.turn_start.replace(tzinfo=timezone.utc)
 
+    def ready_player(self, player):
+        if player.username not in self.ready_players:
+            self.ready_players.append(player.username)
+
+    @property
+    def current_team(self):
+        team_color = current_team(self.board_state['turn'])
+        return getattr(self, team_color + '_team')
+
+    def all_players_ready(self):
+        return set(map(lambda p: p.username, self.current_team.players)) == set(self.ready_players)
+
     def get_all_connections(self, entity_id, entity_team):
         entities = self.board_state['teams'][entity_team]['entities']
         entity = entities[entity_id]
@@ -114,11 +128,11 @@ class Game(db.Model):
             if connection['id'] in entity.get('connections', []):
                 connected_entities[connection['id']] = connection
         for candidate in entities.values():
-            if entity in candidate['connections']:
+            if entity in candidate.get('connections', []):
                 connected_entities[candidate['id']] = candidate
         return connected_entities, entity
 
-    def perform_checks(self, inputs):
+    def perform_checks(self, inputs, player):
         validation_errors = list()
 
         turn = self.board_state['turn']
@@ -128,10 +142,16 @@ class Game(db.Model):
         if self.victor is not None:
             validation_errors.append(('The game is finished!', 'error'))
 
+        if player.username in self.ready_players:
+            validation_errors.append(('You already finished your turn - waiting for other players.', 'error'))
+
+        if player not in self.current_team.players:
+            validation_errors.append(('It is not your turn now, wait for your opponents to finish.', 'error'))
+
         return validation_errors
 
-    def _do_revitalize(self, entity, inputs):
-        vitality_recovered = int(inputs.get(entity['id'] + '__revitalize'))
+    def _do_revitalize(self, entity):
+        vitality_recovered = int(self.player_inputs.get(entity['id'] + '__revitalize'))
         recovery_cost = vitality_recovery_cost[vitality_recovered]
         entity['vitality'] += vitality_recovered
         entity['resource'] -= recovery_cost
@@ -197,10 +217,10 @@ class Game(db.Model):
                 self.board_state['teams']['blue']['uk_gov']['resource'] -= 2
                 self.board_state['teams']['blue']['uk_gov']['vitality'] -= 2
 
-    def _do_attack(self, entity, inputs):
+    def _do_attack(self, entity):
         turn = self.board_state['turn']
-        for target_id, field in find_attack_targets(entity['id'], inputs):
-            attack_investment = int(inputs.get(field) or 0)
+        for target_id, field in find_attack_targets(entity['id'], self.player_inputs):
+            attack_investment = int(self.player_inputs.get(field) or 0)
             dice_roll = randint(1, 6)
             attack_success = attack_result_table[attack_investment][dice_roll]
             self.message_log.append(f"{entity['name']} spent {attack_investment} resources and rolled {dice_roll}.")
@@ -223,9 +243,9 @@ class Game(db.Model):
                             'Success breeds confidence - Online Trolls gained 4 VPs because they launched a large attack while having the Ransomware asset.'
                         )
 
-    def _do_transfer(self, entity, inputs):
-        for target_id, field in find_transfer_targets(entity['id'], inputs):
-            transfer_amount = int(inputs.get(field) or 0)
+    def _do_transfer(self, entity):
+        for target_id, field in find_transfer_targets(entity['id'], self.player_inputs):
+            transfer_amount = int(self.player_inputs.get(field) or 0)
             target = self.get_entity(target_id)
             target['resource'] += transfer_amount
             entity['resource'] -= transfer_amount
@@ -235,15 +255,15 @@ class Game(db.Model):
                     entity['victory_points'] -= 1
                     self.message_log.append(f"Resist the drain - {entity['name']} lost 1 VP due to the transfer of resources.")
 
-    def process_inputs(self, inputs):
+    def process_inputs(self):
         teams = self.board_state['teams']
         team = teams[current_team(self.board_state['turn'])]
         asset = Asset(self.board_state)
-        if activated_assets := inputs.get('activated-assets'):
+        if activated_assets := self.player_inputs.get('activated-assets'):
             activated_asset_ids = map(int, activated_assets.split(', '))
             used_assets = list()
             for index in activated_asset_ids:
-                asset.resolve(team['assets'][index], inputs.get('option-' + str(index), ''))
+                asset.resolve(team['assets'][index], self.player_inputs.get('option-' + str(index), ''))
                 used_assets.append(index)
 
             used_assets.sort(reverse=True)
@@ -251,16 +271,16 @@ class Game(db.Model):
                 del team['assets'][index]
 
         for entity in self.get_current_entities().values():
-            if action := inputs.get(entity['id'] + '__action'):
+            if action := self.player_inputs.get(entity['id'] + '__action'):
                 match action:
                     case '' | 'none':
                         pass
                     case 'revitalize':
-                        self._do_revitalize(entity, inputs)
+                        self._do_revitalize(entity)
                     case 'attack':
-                        self._do_attack(entity, inputs)
+                        self._do_attack(entity)
                     case 'transfer':
-                        self._do_transfer(entity, inputs)
+                        self._do_transfer(entity)
 
             if entity['id'] == 'uk_gov' and entity['traits'].get('banking_error'):
                 entity['traits']['banking_error'] = False
@@ -415,8 +435,13 @@ class Game(db.Model):
         self.calculate_blue_victory_points(turn, entities)
         self.calculate_red_victory_points(turn, entities)
 
-    def process_turn(self, inputs):
-        self.process_inputs(inputs)
+    def process_turn(self, inputs, timeout=False):
+        self.player_inputs.update(inputs)
+
+        if not timeout and not self.all_players_ready():
+            return
+
+        self.process_inputs()
         self.progress_time()
 
         self.give_resources()
@@ -431,6 +456,9 @@ class Game(db.Model):
         # end of month
         if turn % 2 == 1:
             self.calculate_victory_points()
+
+        self.ready_players.clear()
+        self.player_inputs.clear()
 
         self.history.append(self.board_state)
 
