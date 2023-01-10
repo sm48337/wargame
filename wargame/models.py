@@ -102,6 +102,10 @@ class Game(db.Model):
             if entity := self.board_state['teams'][team]['entities'].get(entity_id):
                 return entity
 
+    @property
+    def turn_start_utc(self):
+        return self.turn_start.replace(tzinfo=timezone.utc)
+
     def get_all_connections(self, entity_id, entity_team):
         entities = self.board_state['teams'][entity_team]['entities']
         entity = entities[entity_id]

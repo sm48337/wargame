@@ -1,4 +1,4 @@
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone
 
 from flask import Blueprint, flash, render_template, request, redirect, url_for
 from flask_login import login_required
@@ -69,7 +69,7 @@ def board(game_id):
         db.session.commit()
         return redirect(url_for('game.board', game_id=game.id))
 
-    elif (game.turn_start + timedelta(minutes=3, seconds=5)) < datetime.now():
+    elif (game.turn_start_utc + timedelta(minutes=3, seconds=5)) < datetime.now(timezone.utc):
         game.process_turn(dict())
         db.session.commit()
 
