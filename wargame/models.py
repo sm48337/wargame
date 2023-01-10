@@ -156,7 +156,7 @@ class Game(db.Model):
             direct_amount *= 2
         if target['traits'].get('education') or target['traits'].get('bargaining_chip'):
             direct_amount //= 2
-        if target['traits']['ransomware']:
+        if target['traits'].get('ransomware'):
             target['traits']['paralyzed'] = 3
 
         target['vitality'] -= direct_amount
