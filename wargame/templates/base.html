@@ -22,6 +22,7 @@
                 <li><a href="{{ url_for('game.home') }}" class="navbar-item">Home</a></li>
                 <li><a href="{{ url_for('auth.logout') }}" class="navbar-item">Logout</a></li>
             </ul>
+            <p class="username">{{ current_user.username }}</p>
         </div>
         {% endblock %}
         {% block content %}

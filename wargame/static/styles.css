@@ -279,6 +279,13 @@ th, td {
     padding: 5px;
 }
 
+p.username {
+    position: absolute;
+    top: 0px;
+    right: 20px;
+    color: #464646;
+}
+
 h1 {
     text-align: center;
 }
