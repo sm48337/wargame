@@ -142,8 +142,8 @@
         const openFunction = () => {
             marketDialog.showModal();
         };
-        scsOpen.addEventListener('change', openFunction);
-        gchqOpen.addEventListener('change', openFunction);
+        if (scsOpen) scsOpen.addEventListener('change', openFunction);
+        if (gchqOpen) gchqOpen.addEventListener('change', openFunction);
         cancelDialog.addEventListener('click', e => {
             marketDialog.close();
             e.preventDefault();
