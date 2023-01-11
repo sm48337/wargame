@@ -1,6 +1,10 @@
+{% set controller = entity_controller(context[team + '_team'], entity.id) %}
 <div class="entity-display">
+    <span class="entity-controller">{{ controller.username }}</span>
     <span class="entity-vp">VP: {{ entity.victory_points }}</span>
+    <div>
     <img src="{{ entity.image }}">
+    </div>
     <span class="entity-name">{{ entity.name }}</span>
 </div>
 <div class="entity-stats">
@@ -11,7 +15,7 @@
         Vitality - {{ entity.vitality }}
     </div>
 </div>
-{% if current_team(context.board_state['turn']) == team and can_play_with_entity(context[team + '_team'], current_user, entity.id) %}
+{% if current_team(context.board_state['turn']) == team and controller == current_user %}
 <div class="entity-actions">
     <fieldset>
         <legend>Actions</legend>

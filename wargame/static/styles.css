@@ -138,6 +138,11 @@ th, td {
     height: 50px;
 }
 
+.entity-controller {
+    float: left;
+    padding: 5px;
+}
+
 .entity-vp {
     float: right;
     padding: 5px;

@@ -290,9 +290,9 @@ class Asset:
         getattr(self, asset_id)(option)
 
 
-def can_play_with_entity(team, player, entity):
+def entity_controller(team, entity):
     entity_type = entity_type_mapping[entity]
-    return player == getattr(team, entity_type + '_player')
+    return getattr(team, entity_type + '_player')
 
 
 def helper_functions():
@@ -307,6 +307,6 @@ def helper_functions():
         waiting_for_move=waiting_for_move,
         teams=teams,
         entity_ids_by_team=entity_ids_by_team,
-        can_play_with_entity=can_play_with_entity,
+        entity_controller=entity_controller,
         get_assets=Asset.get_assets,
     )
