@@ -192,7 +192,7 @@
     <div id="round-timer" class="time-green">03:00</div>
     {% endif %}
     <div class="game-info">
-        <div class="month">{{ turn_to_month(context.board_state.turn) }}</div>
+        <div class="month {{ current_team(context.board_state['turn']) }}">{{ turn_to_month(context.board_state.turn) }}</div>
         <div class="team-vps">
             Victory Points - Russia: {{ total_vps(context.board_state.teams.red) }} - UK: {{ total_vps(context.board_state.teams.blue) }}</div>
     </div>

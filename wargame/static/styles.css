@@ -3,6 +3,8 @@
     --card-width: 250px;
     --light-background: #d3d3d3;
     --dark-background: #b5b5b5;
+    --red-team-color: hsl(0 100% 50%);
+    --blue-team-color: hsl(220 100% 50%);
 }
 
 body {
@@ -54,7 +56,6 @@ th, td {
 }
 
 #red {
-    --team-color: 0 100% 50%;
     --top-offset: 20%;
     --bottom-offset: 10%;
     flex-grow: 10;
@@ -62,7 +63,6 @@ th, td {
 }
 
 #blue {
-    --team-color: 220 100% 50%;
     --top-offset: 10%;
     --bottom-offset: 20%;
     flex-grow: 10;
@@ -259,6 +259,15 @@ th, td {
 
 .month {
     top: 70px;
+    color: var(--current-team-color);
+}
+
+.month.red {
+    --current-team-color: var(--red-team-color);
+}
+
+.month.blue {
+    --current-team-color: var(--blue-team-color);
 }
 
 .team-vps {
