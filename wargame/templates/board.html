@@ -211,8 +211,8 @@
     <fieldset id="message-log">
         <legend>Message Log</legend>
         <ul>
-            {% for msg in context.message_log | reverse %}
-            <li>{{ msg }}</li>
+            {% for message, category in context.message_log | reverse %}
+            <li class="{{ category }}">{{ message }}</li>
             {% endfor %}
         </ul>
     </fieldset>

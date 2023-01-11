@@ -368,6 +368,23 @@ ul.flashes {
     font-family: sans-serif;
 }
 
+#message-log .turn {
+    border-bottom: 2px solid black;
+    font-weight: 500;
+}
+#message-log .important {
+    font-weight: 500;
+}
+
+#message-log .event {
+    color: midnightblue;
+}
+
+#message-log .victory-point {
+    color: darkgreen;
+    font-weight: 500;
+}
+
 #message-log li:nth-child(even) {
     background: var(--dark-background);
 }

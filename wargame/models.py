@@ -104,6 +104,9 @@ class Game(db.Model):
             if entity := self.board_state['teams'][team]['entities'].get(entity_id):
                 return entity
 
+    def log(self, message, category):
+        self.message_log.append((message, category))
+
     @property
     def turn_start_utc(self):
         return self.turn_start.replace(tzinfo=timezone.utc)
@@ -155,7 +158,7 @@ class Game(db.Model):
         recovery_cost = vitality_recovery_cost[vitality_recovered]
         entity['vitality'] += vitality_recovered
         entity['resource'] -= recovery_cost
-        self.message_log.append(f"{entity['name']} spent {recovery_cost} resources to gain {vitality_recovered} vitality.")
+        self.log(f"{entity['name']} spent {recovery_cost} resources to gain {vitality_recovered} vitality.", 'action')
 
     def _entity_destroyed_check(self, entity, entity_team):
         if entity['vitality'] <= 0:
@@ -164,7 +167,7 @@ class Game(db.Model):
             gov = entities.get('uk_gov') or entities.get('rus_gov')
             gov['victory_points'] += 10
             self.determine_winner()
-            self.message_log.append(f"{entity['name']} was dealt fatal damage. Opponent was awarded 10 VPs and the game ended.")
+            self.log(f"{entity['name']} was dealt fatal damage. Opponent was awarded 10 VPs and the game ended.", 'important')
 
     def _do_damage(self, target_id, amount, target_team):
         connections, target = self.get_all_connections(target_id, target_team)
@@ -190,7 +193,7 @@ class Game(db.Model):
             else:
                 connection['vitality'] -= amount // 2
             self._entity_destroyed_check(connection, target_team)
-        self.message_log.append(f"{target['name']} was dealt {amount} damage. Connected entities got {amount // 2} damage.")
+        self.log(f"{target['name']} was dealt {amount} damage. Connected entities got {amount // 2} damage.", 'action')
 
     def _do_attribution(self, attacker, level):
         if attacker == 'bear':
@@ -223,7 +226,7 @@ class Game(db.Model):
             attack_investment = int(self.player_inputs.get(field) or 0)
             dice_roll = randint(1, 6)
             attack_success = attack_result_table[attack_investment][dice_roll]
-            self.message_log.append(f"{entity['name']} spent {attack_investment} resources and rolled {dice_roll}.")
+            self.log(f"{entity['name']} spent {attack_investment} resources and rolled {dice_roll}.", 'action')
 
             if attack_success > 0:
                 self._do_damage(target_id, attack_success, opposing_team(turn))
@@ -236,12 +239,11 @@ class Game(db.Model):
                 if attack_investment >= 3:
                     vp_cost = 1 if attack_investment < 5 else 2
                     self.board_state['teams']['red']['entities']['rus_gov']['victory_points'] -= vp_cost
-                    self.message_log.append(f'Control the Trolls - Russian Government lost {vp_cost} VP because Online Trolls launched a large attack.')
+                    self.log(f'Control the Trolls - Russian Government lost {vp_cost} VP because Online Trolls launched a large attack.', 'victory-point')
                     if 'ransomware' in entity['traits'].get('assets', []):
                         entity['victory_points'] += 4
-                        self.message_log.append(
-                            'Success breeds confidence - Online Trolls gained 4 VPs because they launched a large attack while having the Ransomware asset.'
-                        )
+                        self.log('Success breeds confidence - Online Trolls gained 4 VPs because they launched a large attack '
+                                 'while having the Ransomware asset.', 'victory-point')
 
     def _do_transfer(self, entity):
         for target_id, field in find_transfer_targets(entity['id'], self.player_inputs):
@@ -250,10 +252,10 @@ class Game(db.Model):
             target['resource'] += transfer_amount
             entity['resource'] -= transfer_amount
             if transfer_amount:
-                self.message_log.append(f"{entity['name']} sent {transfer_amount} resources to {target['name']}.")
+                self.log(f"{entity['name']} sent {transfer_amount} resources to {target['name']}.", 'action')
                 if entity['id'] == 'elect':
                     entity['victory_points'] -= 1
-                    self.message_log.append(f"Resist the drain - {entity['name']} lost 1 VP due to the transfer of resources.")
+                    self.log(f"Resist the drain - {entity['name']} lost 1 VP due to the transfer of resources.", 'victory-point')
 
     def process_inputs(self):
         teams = self.board_state['teams']
@@ -317,15 +319,17 @@ class Game(db.Model):
     def give_resources(self):
         entities = self.get_current_entities()
         if entities.get('rus_gov', {}).get('traits', {}).get('people_revolt'):
-            entities['rus_gov']['traits']['people_revolt'] = False
+            rus_gov = entities['rus_gov']
+            rus_gov['traits']['people_revolt'] = False
+            self.log(f"Turn starts - {rus_gov['name']} gains no resources because of the People's revolt effect.", 'event')
             return
         gov_entity = entities.get('rus_gov') or entities.get('uk_gov')
         gov_entity['resource'] += 3
-        self.message_log.append(f"{gov_entity['name']} gains 3 resources.")
+        self.log(f"Turn starts - {gov_entity['name']} gains 3 resources.", 'turn')
 
     def progress_time(self):
         turn = self.board_state['turn']
-        self.message_log.append(f'End of turn {turn // 2 + 1} for the {current_team(turn).capitalize()} team.')
+        self.log(f'End of turn {turn // 2 + 1} for the {current_team(turn).capitalize()} team.', 'turn')
         self.board_state['turn'] += 1
         self.turn_start = datetime.now(timezone.utc)
 
@@ -334,10 +338,10 @@ class Game(db.Model):
         red_vps = total_vps(teams['red'])
         blue_vps = total_vps(teams['blue'])
         self.victor = self.red_team if red_vps > blue_vps else self.blue_team
-        self.message_log.append(f'Team {self.victor.name} won the game having {red_vps} VPs. The opposing team had {blue_vps} VPs.')
+        self.log(f'Team {self.victor.name} won the game having {red_vps} VPs. The opposing team had {blue_vps} VPs.', 'important')
 
     def enable_attacks(self):
-        self.message_log.append('Attacks enabled.')
+        self.log('Attacks enabled.', 'turn')
         for entity in self.board_state['teams']['red']['entities'].values():
             match entity['id']:
                 case 'bear':
@@ -348,11 +352,10 @@ class Game(db.Model):
     def calculate_blue_victory_points(self, turn, entities):
         if entities['elect']['resource'] >= 4:
             entities['uk_gov']['victory_points'] += 1
-            self.message_log.append('Election time - UK Government gains 1 VP because a month ended with Electorate having 4 or more resources.')
+            self.log('Election time - UK Government gains 1 VP because a month ended with Electorate having 4 or more resources.', 'victory-point')
         if turn == end_of_month(12) and entities['rus_gov']['vitality'] < 4:
-            self.message_log.append(
-                'Aggressive outlook - UK Government gains 5 VPs because the Russian Government ended the game with less vitality than it started with.'
-            )
+            self.log('Aggressive outlook - UK Government gains 5 VPs because the Russian Government '
+                     'ended the game with less vitality than it started with.', 'victory-point')
             entities['uk_gov']['victory_points'] += 5
 
         plc_triggers = get_ends_of_months(4, 8, 12)
@@ -362,9 +365,8 @@ class Game(db.Model):
             amount_won = index + 2
             if entities['plc']['resource'] >= limit:
                 entities['plc']['victory_points'] += amount_won
-                self.message_log.append(
-                    f'Weather the Brexit storm - UK PLC gains {amount_won} VP because it had more than {limit} resources at the end of the quarter.'
-                )
+                self.log(f'Weather the Brexit storm - UK PLC gains {amount_won} VP because it had '
+                         'more than {limit} resources at the end of the quarter.', 'victory-point')
 
         quarter_ends = get_ends_of_months(3, 6, 9, 12)
         if turn in quarter_ends:
@@ -374,7 +376,7 @@ class Game(db.Model):
                 amount_won = 1 + 2 * rd['count']
                 plc['victory_points'] += 1 + 2 * rd['count']
                 rd['count'] += 1
-                self.message_log.append(f"Recruitment drive - UK PLC gains {amount_won} VP because it achieved vitality growth last {rd['count']} quarter(s).")
+                self.log(f"Recruitment drive - UK PLC gains {amount_won} VP because it achieved vitality growth last {rd['count']} quarter(s).", 'victory-point')
             else:
                 rd['count'] = 0
             rd['vitality'] = plc['vitality']
@@ -386,7 +388,7 @@ class Game(db.Model):
             if entities['energy']['vitality'] >= limit:
                 amount_won = index + 2
                 entities['energy']['victory_points'] += amount_won
-                self.message_log.append(f'Grow capacity - UK Energy gains {amount_won} VP because has more than {limit} vitality.')
+                self.log(f'Grow capacity - UK Energy gains {amount_won} VP because has more than {limit} vitality.', 'victory-point')
 
     @staticmethod
     def _count_assets_of_type(assets, asset_type):
@@ -395,9 +397,8 @@ class Game(db.Model):
     def calculate_red_victory_points(self, turn, entities):
         if entities['rus_gov']['resource'] >= 3:
             entities['rus_gov']['victory_points'] += 1
-            self.message_log.append(
-                'Some animals are more equal than others - Russian Government gains 1 VP because it ended the month with more than 3 resources.'
-            )
+            self.log('Some animals are more equal than others - Russian Government gains 1 VP '
+                     'because it ended the month with more than 3 resources.', 'victory-point')
 
         bear_triggers = get_ends_of_months(4, 8, 12)
         if turn in bear_triggers:
@@ -407,11 +408,11 @@ class Game(db.Model):
                 amount_won = 1 + index * 2
                 bear['traits']['last_growth_vitality'] = bear['vitality']
                 bear['victory_points'] += amount_won
-                self.message_log.append(f"Those who can't steal - Energetic Bear gains {amount_won} VP because it achieved vitality growth since last check.")
+                self.log(f"Those who can't steal - Energetic Bear gains {amount_won} VP because it achieved vitality growth since last check.", 'victory-point')
 
         if self._count_assets_of_type(self.board_state['teams']['blue']['assets'], 'defence') < self._count_assets_of_type(self.board_state['teams']['red']['assets'], 'attack'):
             entities['scs']['victory_points'] += 2
-            self.message_log.append('Win the arms race - SCS gains 2 VPs because Russia has a better cyber arsenal than the UK.')
+            self.log('Win the arms race - SCS gains 2 VPs because Russia has a better cyber arsenal than the UK.', 'victory-point')
 
         quarter_ends = get_ends_of_months(3, 6, 9, 12)
         if turn in quarter_ends:
@@ -421,9 +422,8 @@ class Game(db.Model):
                 amount_won = 1 + 2 * gc['count']
                 ros['victory_points'] += 1 + 2 * gc['count']
                 gc['count'] += 1
-                self.message_log.append(
-                    f"Grow capacity - Rosenergoatom gains {amount_won} VP because it achieved vitality growth last {gc['count']} quarter(s)."
-                )
+                self.log(f"Grow capacity - Rosenergoatom gains {amount_won} VP because "
+                         "it achieved vitality growth last {gc['count']} quarter(s).", 'victory-point')
             else:
                 gc['count'] = 0
             gc['vitality'] = ros['vitality']
@@ -465,4 +465,4 @@ class Game(db.Model):
     def process_event(self):
         event = Event(self.board_state)
         description = event.handle()
-        self.message_log.append(description)
+        self.log(description, 'event')
