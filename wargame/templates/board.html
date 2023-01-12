@@ -7,7 +7,7 @@
     window.turnStartUrl = '{{ url_for('game.turn_start', game_id=context.id) }}';
     window.turn = {{ context.board_state.turn }};
     window.waitingForMove = {{ waiting_for_move(context, current_user) | lower }};
-    window.victor = '{{ context.victor.username }}';
+    window.victor = '{{ context.victor.name }}';
 </script>
 <script src="/static/js/board.js"></script>
 <div>
