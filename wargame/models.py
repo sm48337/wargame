@@ -366,7 +366,7 @@ class Game(db.Model):
             if entities['plc']['resource'] >= limit:
                 entities['plc']['victory_points'] += amount_won
                 self.log(f'Weather the Brexit storm - UK PLC gains {amount_won} VP because it had '
-                         'more than {limit} resources at the end of the quarter.', 'victory-point')
+                         f'more than {limit} resources at the end of the quarter.', 'victory-point')
 
         quarter_ends = get_ends_of_months(3, 6, 9, 12)
         if turn in quarter_ends:
