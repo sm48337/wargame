@@ -150,6 +150,46 @@ const handleBlackMarket = () => {
   });
 };
 
+const positionArrows = () => {
+  const arrows = document.querySelectorAll('svg.arrow');
+  arrows.forEach(arrow => {
+    const source = document.getElementById(arrow.dataset.from);
+    const target = document.getElementById(arrow.dataset.to);
+    const line = arrow.children[1];
+
+    const sourceRect = source.getBoundingClientRect();
+    const targetRect = target.getBoundingClientRect();
+    // Source completely to the left of the target -> line between the source's right side and the target's left side
+    if (sourceRect.x + sourceRect.width < targetRect.x) {
+      line.x1.baseVal.value = sourceRect.x + sourceRect.width;
+      line.x2.baseVal.value = targetRect.x;
+    // Source completely to the right of the target -> line between the source's left side and the target's right side
+    } else if (targetRect.x + targetRect.width < sourceRect.x) {
+      line.x1.baseVal.value = sourceRect.x;
+      line.x2.baseVal.value = targetRect.x + targetRect.width;
+    // Source and target overlap on the X axis -> line between middle points of both
+    } else {
+      line.x1.baseVal.value = sourceRect.x + sourceRect.width / 2;
+      line.x2.baseVal.value = targetRect.x + targetRect.width / 2;
+    }
+    // Source completely over the target -> line between the source's bottom and the target's top
+    if (sourceRect.y + sourceRect.height < targetRect.y) {
+      line.y1.baseVal.value = sourceRect.y + sourceRect.height;
+      line.y2.baseVal.value = targetRect.y;
+    // Source completely under the target -> line between the source's top and the target's bottom
+    } else if (targetRect.y + targetRect.height < sourceRect.y) {
+      line.y1.baseVal.value = sourceRect.y;
+      line.y2.baseVal.value = targetRect.y + targetRect.height;
+    // Source and target overlap on the Y axis -> line between middle points of both
+    } else {
+      line.y1.baseVal.value = sourceRect.y + sourceRect.height / 2;
+      line.y2.baseVal.value = targetRect.y + targetRect.height / 2;
+    }
+    line.y1.baseVal.value += window.scrollY;
+    line.y2.baseVal.value += window.scrollY;
+  });
+};
+
 window.onload = () => {
   addClassToTargetOnHover('.attack', 'attack-target');
   addClassToTargetOnHover('.transfer', 'transfer-target');
@@ -164,4 +204,9 @@ window.onload = () => {
   }
   handleAssetsDialog();
   handleBlackMarket();
+  positionArrows();
 };
+
+window.onresize = () => {
+  positionArrows();
+}

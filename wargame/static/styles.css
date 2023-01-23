@@ -87,9 +87,9 @@ th, td {
 
 .card {
     position: absolute;
-    display: inline-block;
+    display: flex;
+    flex-direction: column;
     width: var(--card-width);
-    height: var(--card-height);
     border: 2px solid black;
 }
 
@@ -131,42 +131,53 @@ th, td {
 }
 
 .entity-display {
+    display: flex;
+    flex-direction: column;
+    flex: 1;
     text-align: center;
 }
 
+.entity-top {
+    display: flex;
+    flex: 1;
+}
+
 .entity-display img {
+    flex: 1;
     height: 50px;
 }
 
 .entity-controller {
-    float: left;
+    flex: 1;
     padding: 5px;
 }
 
 .entity-vp {
-    float: right;
+    flex: 1;
     padding: 5px;
 }
 
+.entity-name {
+    flex: 1;
+}
+
 .entity-stats {
-    bottom: 0;
+    display: flex;
+    flex: 1;
 }
 
 .entity-resources, .entity-vitality {
+    flex: 1;
     width: 50%;
     box-sizing: border-box;
     text-align: center;
 }
 
 .entity-resources {
-    float: left;
-    box-sizing: border-box;
     border: 2px inset yellow;
 }
 
 .entity-vitality {
-    float: right;
-    box-sizing: border-box;
     border: 2px inset blue;
 }
 
@@ -188,6 +199,27 @@ th, td {
 
 #red .entity-actions {
     transform: translate(0, 25px);
+}
+
+svg.arrow {
+    position: absolute;
+    top: 0;
+    left: 0;
+    height: 100%;
+    width: 100%;
+}
+
+svg.connection-arrow line {
+    stroke: black;
+    stroke-width: 1.25px;
+    stroke-dasharray: 8;
+    marker-end: url(#black-arrow);
+}
+
+svg.attack-arrow line {
+    stroke: red;
+    stroke-width: 2px;
+    marker-end: url(#red-arrow);
 }
 
 .action-hide {

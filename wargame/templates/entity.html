@@ -1,11 +1,13 @@
 {% set controller = entity_controller(context[team + '_team'], entity.id) %}
 <div class="entity-display">
-    <span class="entity-controller">{{ controller.username }}</span>
-    <span class="entity-vp">VP: {{ entity.victory_points }}</span>
-    <div>
-    <img src="{{ entity.image }}">
+    <div class="entity-top">
+        <div class="entity-controller">{{ controller.username }}</div>
+        <div>
+            <img src="{{ entity.image }}">
+        </div>
+        <div class="entity-vp">VP: {{ entity.victory_points }}</div>
     </div>
-    <span class="entity-name">{{ entity.name }}</span>
+    <div class="entity-name">{{ entity.name }}</div>
 </div>
 <div class="entity-stats">
     <div class="entity-resources">
