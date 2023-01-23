@@ -452,10 +452,11 @@ class Game(db.Model):
         elif turn == end_of_month(12):
             self.determine_winner()
 
-        self.process_event()
         # end of month
         if turn % 2 == 1:
             self.calculate_victory_points()
+        else:
+            self.process_event()
 
         self.ready_players.clear()
         self.player_inputs.clear()
