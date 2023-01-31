@@ -1,3 +1,5 @@
+const setTitle = () => document.title = `Wargame: ${window.currentUser} - ${window.playerTeam}`;
+
 const addClassToTargetOnHover = (selector, className) => {
   const selected = document.querySelectorAll(selector);
   selected.forEach(source => {
@@ -191,6 +193,7 @@ const positionArrows = () => {
 };
 
 window.onload = () => {
+  setTitle();
   addClassToTargetOnHover('.attack', 'attack-target');
   addClassToTargetOnHover('.transfer', 'transfer-target');
   makeOnlySelectedOptionVisible();

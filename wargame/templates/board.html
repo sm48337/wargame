@@ -2,6 +2,8 @@
 
 {% block content %}
 <script>
+    window.currentUser = "{{ current_user.username }}";
+    window.playerTeam = "{{ get_player_team(current_user, context) | capitalize }} Team";
     window.vitality_recovery_cost = {{ vitality_recovery_cost }};
     window.roundEnd = new Date("{{ turn_end(context.turn_start) }}");
     window.turnStartUrl = '{{ url_for('game.turn_start', game_id=context.id) }}';

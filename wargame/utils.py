@@ -295,6 +295,10 @@ def entity_controller(team, entity):
     return getattr(team, entity_type + '_player')
 
 
+def get_player_team(current_user, game):
+    return 'red' if current_user in game.red_team.players else 'blue'
+
+
 def helper_functions():
     return dict(
         turn_to_month=turn_to_month,
@@ -309,4 +313,5 @@ def helper_functions():
         entity_ids_by_team=entity_ids_by_team,
         entity_controller=entity_controller,
         get_assets=Asset.get_assets,
+        get_player_team=get_player_team,
     )
