@@ -53,7 +53,9 @@
     <div id="{{ team }}">
         <div class="core">
             {% for entity in context.board_state.teams[team].entities.values() %}
-            <div class="card" id={{ entity.id }}>
+            {% set controller = entity_controller(context[team + '_team'], entity.id) %}
+            {% set active = current_team(context.board_state['turn']) == team and controller == current_user %}
+            <div class="card {{ 'active' if active else 'inactive' }}" tabindex="1" id={{ entity.id }}>
                 {% include 'entity.html' %}
             </div>
             {% endfor %}

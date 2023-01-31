@@ -1,4 +1,3 @@
-{% set controller = entity_controller(context[team + '_team'], entity.id) %}
 <div class="entity-display">
     <div class="entity-top">
         <div class="entity-controller">{{ controller.username }}</div>
@@ -17,7 +16,7 @@
         Vitality - {{ entity.vitality }}
     </div>
 </div>
-{% if current_team(context.board_state['turn']) == team and controller == current_user %}
+{% if active %}
 <div class="entity-actions">
     <fieldset>
         <legend>Actions</legend>
