@@ -215,4 +215,4 @@ window.onload = () => {
 
 window.onresize = () => {
   positionArrows();
-}
+};

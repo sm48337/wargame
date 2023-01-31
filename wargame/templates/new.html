@@ -2,18 +2,21 @@
 
 {% block content %}
 
+<script src="/static/js/new_game.js"></script>
+
 <form id="game" method="post" action="new">
+    <div class="teams">
     {% for team in teams %}
-    <div>
-        <fieldset id="create-{{ team }}-team">
+        <fieldset id="create-{{ team }}-team" class="team-composition">
             <legend>{{ team.capitalize() }} Team</legend>
             <label for="{{ team }}-team-name">Team name:</label>
             <input type="text" id="{{ team }}-team-name" name="{{ team }}-team-name" required>
-            {% for entity_id in entity_ids_by_team[team] %}
+                {% for entity_id in entity_ids_by_team[team] %}
             <div class="entity-player-picker">
                 <label for="{{ entity_id }}">{{ display_name(entity_id) }} player:</label>
                 <div>
-                    <select name="{{ entity_id }}" id="{{ entity_id }}">
+                    <select name="{{ entity_id }}" id="{{ entity_id }}" required autocomplete="off">
+                        <option class="hidden-option"></option>
                         {% for player in context.players %}
                         <option value="{{ player.id }}">{{ player.username }}</option>
                         {% endfor %}
@@ -22,17 +25,11 @@
             </div>
             {% endfor %}
         </fieldset>
-    </div>
     {% endfor %}
-    <div>
-        <div>
-            <label for="description">Game description (optional):</label>
-        </div>
-        <textarea id="description" name="description" cols=40 rows=10></textarea>
     </div>
-    <div>
-        <input type="submit" value="Create game" class="create-game-btn">
-    </div>
+    <label class="game-description" for="description">Game description (optional):</label>
+    <textarea class="game-description" id="description" name="description" cols=80 rows=10></textarea>
+    <input type="submit" value="Create game" class="create-game-btn">
 </form>
 
 {% endblock %}
