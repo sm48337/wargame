@@ -1,6 +1,7 @@
 {% extends "base.html" %}
 
 {% block content %}
+{% set ns = namespace() %}
 <script>
     window.currentUser = "{{ current_user.username }}";
     window.playerTeam = "{{ get_player_team(current_user, context) | capitalize }} Team";
@@ -56,7 +57,10 @@
         <div class="core">
             {% for entity in context.board_state.teams[team].entities.values() %}
             {% set controller = entity_controller(context[team + '_team'], entity.id) %}
-            {% set active = current_team(context.board_state['turn']) == team and controller == current_user %}
+            {% set active = current_team(context.board_state['turn']) == team and controller == current_user and current_user.username not in context.ready_players %}
+            {% if active %}
+                {% set ns.has_actions = True %}
+            {% endif %}
             <div class="card {{ 'active' if active else 'inactive' }}" tabindex="1" id={{ entity.id }}>
                 {% include 'entity.html' %}
             </div>
@@ -72,6 +76,8 @@
             {% endfor %}
         </ul>
     </fieldset>
+    {% if ns.has_actions %}
     <input type="submit" value="Finish turn" class="finish-turn-btn">
+    {% endif %}
 </form>
 {% endblock %}
