@@ -5,6 +5,8 @@ from flask_login.mixins import UserMixin
 from sqlalchemy import Column, ForeignKey, String, Integer, Boolean, DateTime, JSON, or_
 from sqlalchemy.ext.mutable import MutableDict, MutableList
 from sqlalchemy.orm import relationship
+from werkzeug.security import check_password_hash, generate_password_hash
+
 from .db import db
 from .utils import (
     attack_result_table, current_team, opposing_team, find_attack_targets, find_transfer_targets,
@@ -19,6 +21,13 @@ class User(db.Model, UserMixin):
     username = Column(String, nullable=False, unique=True)
     password = Column(String, nullable=False)
     active = Column(Boolean, default=True)
+
+    def __init__(self, username, password):
+        self.username = username
+        self.password = generate_password_hash(password)
+
+    def verify_password(self, password):
+        return check_password_hash(self.password, password)
 
     def is_active(self):
         return self.active

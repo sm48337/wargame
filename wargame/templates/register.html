@@ -12,17 +12,21 @@
 <h1>Registration form</h1>
 <div class="registration">
     <form method="post" class="registration">
-        <p>
+        <div>
             <label for="username">Username:</label>
             <input required type="text" name="username" placeholder="Username"></input>
-        </p>
-        <p>
+        </div>
+        <div>
             <label for="password">Password:</label>
             <input required type="password" name="password" placeholder="Password"></input>
-        </p>
-        <p>
+        </div>
+        <div>
+            <label for="password">Repeat Password:</label>
+            <input required type="password" name="password_repeat" placeholder="Password"></input>
+        </div>
+        <div>
             <button type="submit">Register</button>
-        </p>
+        </div>
     </form>
 </div>
 {% endblock %}

@@ -15,7 +15,7 @@ def login():
     password = request.form.get('password')
     user = User.query.filter_by(username=username).first()
 
-    if user and user.password == password:
+    if user and user.verify_password(password):
         login_user(user)
         next = request.args.get('next')
         return redirect(next or url_for('game.home'))
@@ -40,7 +40,13 @@ def register():
 
     username = request.form.get('username')
     password = request.form.get('password')
-    new_user = User(username=username, password=password)
+    password_repeat = request.form.get('password_repeat')
+
+    if password != password_repeat:
+        flash('Passwords do not match!', 'error')
+        return render_template('register.html')
+
+    new_user = User(username, password)
 
     db.session.add(new_user)
     db.session.commit()
