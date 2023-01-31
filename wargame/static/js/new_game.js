@@ -15,7 +15,7 @@ const ensurePlayerOnOnlyOneTeam = () => {
         for (option of p.children) {
           if (playersInTeam.includes(option.value)) {
             option.classList.add('hidden-option');
-          } else {
+          } else if (option.value !== '') {
             option.classList.remove('hidden-option');
           }
         }
