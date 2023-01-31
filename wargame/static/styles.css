@@ -318,6 +318,11 @@ svg.attack-arrow line {
     padding-inline: 10px;
 }
 
+.navbar * {
+    position: relative;
+    z-index: 1000;
+}
+
 .navbar > ul {
     list-style: none;
     text-align: center;
