@@ -343,6 +343,14 @@ svg.attack-arrow line {
     top: 110px;
 }
 
+#toggle-pause-button {
+    position: absolute;
+    left: 100px;
+    padding: 5px;
+    width: 50px;
+    z-index: 1000;
+}
+
 .finish-turn-btn {
     position: absolute;
     bottom: 0px;

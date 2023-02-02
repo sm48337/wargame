@@ -71,46 +71,74 @@ const changeMaxTransferValue = () => {
   });
 };
 
-const timerManagement = () => {
+const refreshTime = () => {
+  if (!window.refreshTimeTimer) {
+    window.refreshTimeTimer = setInterval(refreshTime, 1000);
+  }
+  if (window.isPaused) {
+    return;
+  }
   const display = document.getElementById('round-timer');
   const form = document.getElementById('board');
-  const refreshTime = () => {
-    const now = new Date();
-    const utc = new Date(now.getTime() + now.getTimezoneOffset() * 60000);
-    const timeLeft = new Date(window.roundEnd - utc);
-    const options = {
-      minute: '2-digit',
-      second: '2-digit'
-    };
-    if (window.waitingForMove) {
-      if (timeLeft.getTime() <= 0) {
-        form.submit();
-      }
-    } else if (timeLeft.getTime() <= -5000) {
-      location.reload();
-    }
-    if (!display) return;
-    display.textContent = timeLeft.toLocaleTimeString('en-us', options);
-    if (timeLeft.getTime() < 1 * 60 * 1000) {
-      display.classList.remove('time-green');
-      display.classList.remove('time-yellow');
-      display.classList.add('time-red');
-    } else if (timeLeft.getTime() < 2 * 60 * 1000) {
-      display.classList.remove('time-green');
-      display.classList.add('time-yellow');
-    }
+
+  const timeLeft = new Date(window.secondsLeft * 1000);
+  window.secondsLeft -= 1;
+  const options = {
+    minute: '2-digit',
+    second: '2-digit'
   };
-  setInterval(refreshTime, 1000);
+  if (window.waitingForMove) {
+    if (timeLeft.getTime() <= 0) {
+      form.submit();
+    }
+  } else if (timeLeft.getTime() <= -5000) {
+    location.reload();
+  }
+
+  display.textContent = timeLeft.toLocaleTimeString('en-us', options);
+  if (timeLeft.getTime() < 1 * 60 * 1000) {
+    display.classList.remove('time-green');
+    display.classList.remove('time-yellow');
+    display.classList.add('time-red');
+  } else if (timeLeft.getTime() < 2 * 60 * 1000) {
+    display.classList.remove('time-green');
+    display.classList.add('time-yellow');
+  }
+};
+
+const timerManagement = () => {
   refreshTime();
+  setInterval(refreshIfTurnOver, 5000);
+  refreshIfTurnOver();
 }
 
 const refreshIfTurnOver = () => {
-  fetch(window.turnStartUrl)
+  const display = document.getElementById('round-timer');
+
+  fetch(window.timeLeftUrl)
     .then(resp => resp.json())
     .then(data => {
-      const turn_start = new Date(data.start);
-      const current_time = new Date();
-      if (data.turn != window.turn || turn_start > current_time) {
+      window.secondsLeft = data.secondsLeft;
+      window.isStarting = data.isStarting;
+      window.startingDelay = data.startingDelay;
+
+      if (window.isPaused !== data.isPaused) {
+        window.isPaused = data.isPaused;
+        if (window.isPaused) {
+          clearInterval(window.refreshTimeTimer);
+          delete window.refreshTimeTimer;
+        }
+        if (window.isStarting) {
+          display.textContent = 'Starting...';
+          setTimeout(refreshTime, window.startingDelay * 1000);
+        }
+
+        if (window.isPaused) {
+          display.textContent = 'Paused';
+        }
+      }
+
+      if (data.turn != window.turn) {
         location.reload();
       }
     });
@@ -203,6 +231,19 @@ const positionArrows = () => {
   });
 };
 
+const handlePauseButton = () => {
+  const pauseButton = document.getElementById('toggle-pause-button');
+  pauseButton.hidden = false;
+  pauseButton.addEventListener('click', e => {
+    e.preventDefault()
+    fetch(window.togglePauseUrl)
+      .then(resp => resp.json())
+      .then(data => {
+        pauseButton.textContent = data.paused ? '▶' : '⏸ ';
+      });
+  });
+};
+
 window.onload = () => {
   setTitle();
   scrollDown();
@@ -213,8 +254,8 @@ window.onload = () => {
   changeMaxTransferValue();
   if (!window.victor) {
     timerManagement();
-    if (!window.waitingForMove) {
-      setInterval(refreshIfTurnOver, 5000);
+    if (window.isOwner) {
+      handlePauseButton();
     }
   }
   handleAssetsDialog();

@@ -4,6 +4,7 @@ from itertools import chain
 from json import load
 from random import choice
 from re import match
+from time import strftime, gmtime
 
 
 class Event:
@@ -299,6 +300,14 @@ def get_player_team(current_user, game):
     return 'red' if current_user in game.red_team.players else 'blue'
 
 
+def get_timer_string(game):
+    if game.is_starting:
+        return 'Starting...'
+    if game.is_paused:
+        return 'Paused'
+    return strftime('%M:%S', gmtime(game.time_left()))
+
+
 def helper_functions():
     return dict(
         turn_to_month=turn_to_month,
@@ -314,4 +323,5 @@ def helper_functions():
         entity_controller=entity_controller,
         get_assets=Asset.get_assets,
         get_player_team=get_player_team,
+        get_timer_string=get_timer_string,
     )

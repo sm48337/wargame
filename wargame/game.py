@@ -1,6 +1,4 @@
-from datetime import datetime, timedelta, timezone
-
-from flask import Blueprint, flash, render_template, request, redirect, url_for
+from flask import Blueprint, abort, flash, render_template, request, redirect, url_for
 from flask_login import login_required, current_user
 
 from .models import db, User, Game, Team
@@ -37,20 +35,36 @@ def new():
     description = request.form.get('description')
     state = get_initial_board_state()
 
-    new_game = Game(red_team=red_team, blue_team=blue_team, board_state=state, description=description)
+    new_game = Game(owner=current_user, red_team=red_team, blue_team=blue_team, board_state=state, description=description)
     db.session.add(new_game)
     db.session.commit()
 
     return redirect(url_for('game.board', game_id=new_game.id))
 
 
-@bp.route('game/<int:game_id>/turn_start')
+@bp.route('game/<int:game_id>/toggle_pause')
 @login_required
-def turn_start(game_id):
+def toggle_pause(game_id):
+    game = Game.query.get_or_404(game_id)
+    if current_user != game.owner:
+        abort(403)
+    game.toggle_pause()
+    db.session.commit()
+    return {
+        'paused': game.is_paused
+    }
+
+
+@bp.route('game/<int:game_id>/time_left')
+@login_required
+def time_left(game_id):
     game = Game.query.get_or_404(game_id)
     return {
         'turn': game.board_state['turn'],
-        'start': game.turn_start.isoformat(),
+        'secondsLeft': game.time_left(),
+        'isStarting': game.is_starting,
+        'isPaused': game.is_paused,
+        'startingDelay': game.starting_delay if game.is_starting else 0,
     }
 
 
@@ -70,7 +84,7 @@ def board(game_id):
         db.session.commit()
         return redirect(url_for('game.board', game_id=game.id))
 
-    elif (game.turn_start_utc + timedelta(minutes=3, seconds=5)) < datetime.now(timezone.utc):
+    elif not game.is_paused and game.time_left() < -5:
         game.process_turn(dict(), timeout=True)
         db.session.commit()
 

@@ -1,5 +1,5 @@
+from datetime import datetime, timedelta
 from random import randint
-from datetime import datetime, timezone
 
 from flask_login.mixins import UserMixin
 from sqlalchemy import Column, ForeignKey, String, Integer, Boolean, DateTime, JSON, or_
@@ -81,7 +81,12 @@ class Team(db.Model):
 class Game(db.Model):
     __tablename__ = 'game'
 
+    round_length = timedelta(minutes=3)
+    unpause_delay = timedelta(seconds=5)
+
     id = Column(Integer, primary_key=True)
+    owner_id = Column(ForeignKey('user.id'), nullable=False)
+    owner = relationship('User')
     red_team_id = Column(ForeignKey('team.id'), nullable=False)
     red_team = relationship('Team', foreign_keys=[red_team_id])
     blue_team_id = Column(ForeignKey('team.id'), nullable=False)
@@ -95,7 +100,9 @@ class Game(db.Model):
     board_state = Column(MutableDict.as_mutable(JSON))
     history = Column(MutableList.as_mutable(JSON), default=list)
     message_log = Column(MutableList.as_mutable(JSON), default=list)
-    turn_start = Column(DateTime, default=lambda: datetime.now(timezone.utc))
+    unpause_time = Column(DateTime, default=datetime.now)
+    seconds_left = Column(Integer, default=int(round_length.total_seconds()))
+    is_paused = Column(Boolean, default=True)
 
     def __init__(self, *args, **kwargs):
         kwargs['history'] = [kwargs['board_state']]
@@ -103,6 +110,17 @@ class Game(db.Model):
         self.message_log = list()
         self.give_resources()
         self.process_event()
+
+    def toggle_pause(self):
+        if self.is_starting:
+            return
+
+        if self.is_paused:
+            self.unpause_time = datetime.now() + self.unpause_delay
+        else:
+            difference = (datetime.now() - self.unpause_time)
+            self.seconds_left -= int(difference.total_seconds())
+        self.is_paused = not self.is_paused
 
     def get_current_entities(self):
         turn = self.board_state['turn']
@@ -116,9 +134,20 @@ class Game(db.Model):
     def log(self, message, category):
         self.message_log.append((message, category))
 
+    def time_left(self):
+        if self.is_paused:
+            return self.seconds_left
+        difference = self.unpause_time + timedelta(seconds=self.seconds_left) - datetime.now()
+        return int(difference.total_seconds())
+
     @property
-    def turn_start_utc(self):
-        return self.turn_start.replace(tzinfo=timezone.utc)
+    def is_starting(self):
+        return self.starting_delay > 0
+
+    @property
+    def starting_delay(self):
+        time_delay = self.unpause_time - datetime.now()
+        return time_delay.total_seconds()
 
     def ready_player(self, player):
         if player.username not in self.ready_players:
@@ -340,7 +369,8 @@ class Game(db.Model):
         turn = self.board_state['turn']
         self.log(f'End of turn {turn // 2 + 1} for the {current_team(turn).capitalize()} team.', 'turn')
         self.board_state['turn'] += 1
-        self.turn_start = datetime.now(timezone.utc)
+        self.unpause_time = datetime.now()
+        self.seconds_left = int(self.round_length.total_seconds())
 
     def determine_winner(self):
         teams = self.board_state['teams']

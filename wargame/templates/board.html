@@ -6,8 +6,13 @@
     window.currentUser = "{{ current_user.username }}";
     window.playerTeam = "{{ get_player_team(current_user, context) | capitalize }} Team";
     window.vitality_recovery_cost = {{ vitality_recovery_cost }};
-    window.roundEnd = new Date("{{ turn_end(context.turn_start) }}");
-    window.turnStartUrl = '{{ url_for('game.turn_start', game_id=context.id) }}';
+    window.isOwner = {{ (current_user == context.owner) | lower }};
+    window.isPaused = {{ context.is_paused | lower }};
+    window.secondsLeft = {{ context.time_left() }};
+    window.isStarting = {{ context.is_starting | lower }};
+    window.startingDelay = {{ context.starting_delay }};
+    window.togglePauseUrl = '{{ url_for("game.toggle_pause", game_id=context.id) }}';
+    window.timeLeftUrl = '{{ url_for("game.time_left", game_id=context.id) }}';
     window.turn = {{ context.board_state.turn }};
     window.waitingForMove = {{ waiting_for_move(context, current_user) | lower }};
     window.victor = '{{ context.victor.name }}';
@@ -44,13 +49,17 @@
     {% include 'assets.html' %}
     {% endwith %}
     {% include 'black_market.html' %}
+    {% if current_user == context.owner and not context.victor %}
+    <button id="toggle-pause-button">{{ '▶' if context.is_paused else '⏸ ' }}</button>
+    {% endif %}
     {% if not context.victor %}
-    <div id="round-timer" class="time-green">03:00</div>
+    <div id="round-timer" class="time-green">{{ get_timer_string(context) }}</div>
     {% endif %}
     <div class="game-info">
         <div class="month {{ current_team(context.board_state['turn']) }}">{{ turn_to_month(context.board_state.turn) }}</div>
         <div class="team-vps">
-            Victory Points - Russia: {{ total_vps(context.board_state.teams.red) }} - UK: {{ total_vps(context.board_state.teams.blue) }}</div>
+            Victory Points - Russia: {{ total_vps(context.board_state.teams.red) }} - UK: {{ total_vps(context.board_state.teams.blue) }}
+        </div>
     </div>
     <input type="hidden" id="turn" name="turn" value="{{ context.board_state.turn }}">
     {% for team in context.board_state.teams %}
@@ -62,7 +71,7 @@
             {% if active %}
                 {% set ns.has_actions = True %}
             {% endif %}
-            <div class="card {{ 'active' if active else 'inactive' }}" tabindex="1" id={{ entity.id }}>
+            <div class="card {{ 'active' if active else 'inactive' }}" tabindex="1" id="{{ entity.id }}">
                 {% include 'entity.html' %}
             </div>
             {% endfor %}
