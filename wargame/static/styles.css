@@ -305,14 +305,45 @@ svg.attack-arrow line {
 #assets {
     margin-top: 5%;
     height: 60%;
+    width: 60%;
+    border: none;
+    box-shadow: rgba(0, 0, 0, 0.35) 0px 5px 15px;
+    text-align: center;
+    z-index: 10000;
+}
+
+.asset-container {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+}
+
+#close-assets {
+    position: absolute;
+    bottom: 15px;
+    flex: 1;
 }
 
 .asset {
+    display: flex;
+    flex: 1;
     border: 2px solid black;
     padding: 2px;
     margin: 2px;
+    width: 25%;
+    min-width: 25%;
+    max-width: 25%;
+    flex-direction: column;
 }
 
+.asset > div {
+    flex: 1;
+    background: var(--light-background);
+}
+
+.asset > div:nth-child(even) {
+    background: var(--dark-background);
+}
 .activated-asset {
     color: darkgray;
 }

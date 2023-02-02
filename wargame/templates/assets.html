@@ -1,20 +1,22 @@
 <button type="button" id="open-assets">Assets</button>
 <dialog id="assets">
-    <input type="hidden" id="activated-assets" name="activated-assets" autocomplete="off">
-    {% for asset_name, asset_type, asset_effect, asset_options in get_assets(assets) %}
-    <div class="asset">
-        <div class="asset-name">{{ asset_name }}</div>
-        <div class="asset-type">Type: {{ asset_type }}</div>
-        <div class="asset-effect">{{ asset_effect }}</div>
-        {% if asset_options %}
-        <select name="option-{{ loop.index0 }}">
-            {% for option in asset_options %}
-            <option value="{{ option }}">{{ display_name(option) }}</option>
-            {% endfor %}
-        </select>
-        {% endif %}
-        <button type="button" class="use-asset-btn" data-id="{{ loop.index0 }}">Use</button>
-    </div>
+    <div class="asset-container">
+        <input type="hidden" id="activated-assets" name="activated-assets" autocomplete="off">
+        {% for asset_name, asset_type, asset_effect, asset_options in get_assets(assets) %}
+        <div class="asset">
+            <div class="asset-name">{{ asset_name }}</div>
+            <div class="asset-type">Type: {{ asset_type }}</div>
+            <div class="asset-effect">{{ asset_effect }}</div>
+            {% if asset_options %}
+            <select name="option-{{ loop.index0 }}">
+                {% for option in asset_options %}
+                <option value="{{ option }}">{{ display_name(option) }}</option>
+                {% endfor %}
+            </select>
+            {% endif %}
+            <button type="button" class="use-asset-btn" data-id="{{ loop.index0 }}">Use</button>
+        </div>
     {% endfor %}
+    </div>
     <button id="close-assets">Close</button>
 </dialog>

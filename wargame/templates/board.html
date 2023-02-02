@@ -45,10 +45,6 @@
         {% endfor %}
     {% endfor %}
     </div>
-    {% with assets = context.board_state.teams[current_team(context.board_state['turn'])]['assets'] %}
-    {% include 'assets.html' %}
-    {% endwith %}
-    {% include 'black_market.html' %}
     {% if current_user == context.owner and not context.victor %}
     <button id="toggle-pause-button">{{ '▶' if context.is_paused else '⏸ ' }}</button>
     {% endif %}
@@ -87,6 +83,10 @@
         </ul>
     </fieldset>
     {% if ns.has_actions %}
+    {% with assets = context.board_state.teams[current_team(context.board_state['turn'])]['assets'] %}
+    {% include 'assets.html' %}
+    {% endwith %}
+    {% include 'black_market.html' %}
     <input type="submit" value="Finish turn" class="finish-turn-btn">
     {% endif %}
 </form>

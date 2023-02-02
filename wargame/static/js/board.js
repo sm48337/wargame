@@ -151,6 +151,7 @@ const handleAssetsDialog = () => {
   const useButtons = document.querySelectorAll('.use-asset-btn');
   const activatedAssets = document.getElementById('activated-assets');
 
+  if (!showButton) return;
   showButton.addEventListener('click', () => assetsDialog.showModal());
   closeDialog.addEventListener('click', e => {
     assetsDialog.close();
@@ -174,6 +175,7 @@ const handleBlackMarket = () => {
   const cancelDialog = document.getElementById('cancel-bm');
   const confirmDialog = document.getElementById('confirm-bm');
 
+  if (!cancelDialog) return;
   const openFunction = () => {
     marketDialog.showModal();
   };
