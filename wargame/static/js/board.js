@@ -2,6 +2,15 @@ const setTitle = () => document.title = `Wargame: ${window.currentUser} - ${wind
 
 const scrollDown = () => window.scroll(0, 100);
 
+const resizeBackground = () => {
+  const board = document.getElementById('board');
+  const background = document.getElementById('background-image');
+
+  const boardRect = board.getBoundingClientRect();
+  background.height = boardRect.height;
+  background.width = boardRect.width;
+};
+
 const addClassToTargetOnHover = (selector, className) => {
   const selected = document.querySelectorAll(selector);
   selected.forEach(source => {
@@ -215,4 +224,5 @@ window.onload = () => {
 
 window.onresize = () => {
   positionArrows();
+  resizeBackground();
 };

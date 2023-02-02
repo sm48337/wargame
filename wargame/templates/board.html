@@ -25,6 +25,7 @@
     {% endwith %}
 </div>
 <form id="board" method="post" action="board">
+    <img id="background-image" src="/static/background.svg">
     <div class="arrows">
     {% for team in context.board_state.teams.values() %}
         {% for entity in team.entities.values() %}

@@ -12,12 +12,14 @@ body {
 }
 
 #board {
-    background-image: url(/static/background.svg);
-    background-repeat: no-repeat;
-    background-size: cover;
     height: 100vh;
     display: flex;
     flex-direction: column;
+}
+
+#background-image {
+    position: absolute;
+    z-index: -10;
 }
 
 #game {
