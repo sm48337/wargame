@@ -308,6 +308,17 @@ def get_timer_string(game):
     return strftime('%M:%S', gmtime(game.time_left()))
 
 
+def is_entity_active(game, controller, current_user, team):
+    turn = game.board_state['turn']
+    return all([
+        turn < 24,
+        game.victor is None,
+        current_team(turn) == team,
+        current_user == controller,
+        current_user.username not in game.ready_players,
+    ])
+
+
 def helper_functions():
     return dict(
         turn_to_month=turn_to_month,
@@ -324,4 +335,5 @@ def helper_functions():
         get_assets=Asset.get_assets,
         get_player_team=get_player_team,
         get_timer_string=get_timer_string,
+        is_entity_active=is_entity_active,
     )

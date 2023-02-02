@@ -198,14 +198,22 @@ class Game(db.Model):
         entity['resource'] -= recovery_cost
         self.log(f"{entity['name']} spent {recovery_cost} resources to gain {vitality_recovered} vitality.", 'action')
 
-    def _entity_destroyed_check(self, entity, entity_team):
-        if entity['vitality'] <= 0:
-            opposing_team = teams[1 - teams.index(entity_team)]
-            entities = self.board_state['teams'][opposing_team]['entities']
-            gov = entities.get('uk_gov') or entities.get('rus_gov')
-            gov['victory_points'] += 10
+    def check_health(self):
+        govs = {
+            'red': self.board_state['teams']['red']['entities']['rus_gov'],
+            'blue': self.board_state['teams']['blue']['entities']['uk_gov'],
+        }
+        fatalities = False
+        for team, other_team in zip(teams, reversed(teams)):
+            for entity in self.board_state['teams'][team]['entities'].values():
+                if entity['vitality'] > 0:
+                    continue
+                fatalities = True
+                govs[other_team]['victory_points'] += 10
+                self.log(f"{entity['name']} was dealt fatal damage. Opponent was awarded 10 VPs.", 'important')
+
+        if fatalities:
             self.determine_winner()
-            self.log(f"{entity['name']} was dealt fatal damage. Opponent was awarded 10 VPs and the game ended.", 'important')
 
     def _do_damage(self, target_id, amount, target_team):
         connections, target = self.get_all_connections(target_id, target_team)
@@ -221,7 +229,6 @@ class Game(db.Model):
             target['traits']['paralyzed'] = 3
 
         target['vitality'] -= direct_amount
-        self._entity_destroyed_check(target, target_team)
 
         for connection in connections.values():
             if connection['traits'].get('education'):
@@ -230,7 +237,6 @@ class Game(db.Model):
                 pass
             else:
                 connection['vitality'] -= amount // 2
-            self._entity_destroyed_check(connection, target_team)
         self.log(f"{target['name']} was dealt {amount} damage. Connected entities got {amount // 2} damage.", 'action')
 
     def _do_attribution(self, attacker, level):
@@ -481,21 +487,23 @@ class Game(db.Model):
             return
 
         self.process_inputs()
-        self.progress_time()
+        self.check_health()
 
-        self.give_resources()
+        if not self.victor:
+            self.progress_time()
+            self.give_resources()
 
-        turn = self.board_state['turn']
-        if turn == end_of_month(1):
-            self.enable_attacks()
-        elif turn == end_of_month(12):
-            self.determine_winner()
+            turn = self.board_state['turn']
+            if turn == end_of_month(1):
+                self.enable_attacks()
+            elif turn == end_of_month(12):
+                self.determine_winner()
 
-        # end of month
-        if turn % 2 == 1:
-            self.calculate_victory_points()
-        else:
-            self.process_event()
+            # end of month
+            if turn % 2 == 1:
+                self.calculate_victory_points()
+            else:
+                self.process_event()
 
         self.ready_players.clear()
         self.player_inputs.clear()

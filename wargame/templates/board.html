@@ -67,7 +67,7 @@
         <div class="core">
             {% for entity in context.board_state.teams[team].entities.values() %}
             {% set controller = entity_controller(context[team + '_team'], entity.id) %}
-            {% set active = context.board_state['turn'] < 24 and current_team(context.board_state['turn']) == team and controller == current_user and current_user.username not in context.ready_players %}
+            {% set active = is_entity_active(context, controller, current_user, team) %}
             {% if active %}
                 {% set ns.has_actions = True %}
             {% endif %}
