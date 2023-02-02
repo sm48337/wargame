@@ -213,7 +213,13 @@ th, td {
 
 .card.active {
     box-shadow: 0px 0px 2px 2px lightgreen;
+    cursor: pointer;
 }
+
+.card.inactive {
+    cursor: not-allowed;
+}
+
 .card.active:hover:not(:focus-within) {
     box-shadow: 0px 0px 5px 5px lightgreen;
 }
