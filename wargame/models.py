@@ -329,6 +329,10 @@ class Game(db.Model):
         for index, bm_item in enumerate(self.board_state['black_market']):
             asset, old_bid = bm_item
             bid = int(self.player_inputs.get(f'bm-bid-{index}') or 0)
+            if current_team(turn) == 'red':
+                team['entities']['scs']['resource'] -= bid
+            else:
+                team['entities']['gchq']['resource'] -= bid
             asset_name = Asset.assets[asset][0]
             if old_bid and not bid:
                 self.log(f"Team {opposing_team(turn).capitalize()}'s bid for {asset_name} was not contested - asset gained.", 'action')
