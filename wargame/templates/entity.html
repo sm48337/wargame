@@ -5,6 +5,12 @@
             <img src="{{ entity.image }}">
         </div>
         <div class="entity-vp">VP: {{ entity.victory_points }}</div>
+        <div class="help" tabindex="1">
+            <div class="question-mark">?</div>
+            <div class="help-text">
+                {% include  'help_text/' ~ entity.id ~ '.html'%}
+            </div>
+        </div>
     </div>
     <div class="entity-name">{{ entity.name }}</div>
 </div>

@@ -181,6 +181,40 @@ th, td {
     padding: 5px;
 }
 
+.help {
+    padding: 5px;
+    cursor: help;
+}
+
+.help-text {
+    display: none;
+    cursor: default;
+}
+
+.help:focus-within > .help-text {
+    display: block;
+    width: 600px;
+    max-height: 70vh;
+    overflow: scroll;
+    text-align: left;
+    position: absolute;
+    z-index: 2000;
+    background: var(--light-background);
+    box-shadow: rgba(0, 0, 0, 0.35) 0px 5px 15px;
+    border: 1px solid black;
+    padding: 5px;
+    transform: translate(var(--help-horizontal-offset, -50%), var(--help-vertical-offset, 0%));
+}
+
+#blue .help:focus-within > .help-text {
+    --help-vertical-offset: -100%;
+}
+
+#energy .help:focus-within > .help-text,
+#ros .help:focus-within > .help-text {
+    --help-horizontal-offset: -75%;
+}
+
 .entity-name {
     flex: 1;
 }
