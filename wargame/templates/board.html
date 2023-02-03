@@ -36,11 +36,11 @@
         {% for entity in team.entities.values() %}
             {% for target in entity.connections %}
                 {% set arrow_type = 'connection' %}
-                {% include 'arrow.html' %}
+                {% include 'arrow.svg' %}
             {% endfor %}
             {% for target in entity.attacks %}
                 {% set arrow_type = 'attack' %}
-                {% include 'arrow.html' %}
+                {% include 'arrow.svg' %}
             {% endfor %}
         {% endfor %}
     {% endfor %}
