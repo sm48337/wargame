@@ -1,5 +1,5 @@
 from datetime import datetime, timedelta
-from random import randint
+from random import choice, randint
 
 from flask_login.mixins import UserMixin
 from sqlalchemy import Column, ForeignKey, String, Integer, Boolean, DateTime, JSON, or_
@@ -109,6 +109,8 @@ class Game(db.Model):
         super().__init__(*args, **kwargs)
         self.message_log = list()
         self.give_resources()
+        self.generate_bm_pool()
+        self.get_new_bm_asset()
         self.process_event()
 
     def toggle_pause(self):
@@ -303,18 +305,46 @@ class Game(db.Model):
 
     def process_inputs(self):
         teams = self.board_state['teams']
-        team = teams[current_team(self.board_state['turn'])]
+        turn = self.board_state['turn']
+        team = teams[current_team(turn)]
         asset = Asset(self.board_state)
         if activated_assets := self.player_inputs.get('activated-assets'):
             activated_asset_ids = map(int, activated_assets.split(', '))
             used_assets = list()
             for index in activated_asset_ids:
-                asset.resolve(team['assets'][index], self.player_inputs.get('option-' + str(index), ''))
+                asset_id = team['assets'][index]
+                asset.resolve(asset_id, self.player_inputs.get('option-' + str(index), ''))
+                activated_asset = Asset.assets[asset_id]
+                self.log(f'Team {current_team(turn).capitalize()} activated asset {activated_asset[0]} - {activated_asset[2]}.', 'action')
                 used_assets.append(index)
 
             used_assets.sort(reverse=True)
             for index in used_assets:
                 del team['assets'][index]
+
+        bm_changes = {
+            'remove': [],
+            'bid': [],
+        }
+        for index, bm_item in enumerate(self.board_state['black_market']):
+            asset, old_bid = bm_item
+            bid = int(self.player_inputs.get(f'bm-bid-{index}') or 0)
+            asset_name = Asset.assets[asset][0]
+            if old_bid and not bid:
+                self.log(f"Team {opposing_team(turn).capitalize()}'s bid for {asset_name} was not contested - asset gained.", 'action')
+                self.board_state['teams'][opposing_team(turn)]['assets'].append(asset)
+                bm_changes['remove'].append(index)
+            elif bid:
+                self.log(f'Team {current_team(turn).capitalize()} bid {bid} for {asset_name}.', 'action')
+                self.board_state['black_market'][index] = asset, bid
+                bm_changes['bid'].append((index, bid))
+
+        for index, bid in bm_changes['bid']:
+            asset = self.board_state['black_market'][index][0]
+            self.board_state['black_market'][index] = asset, bid
+
+        for removed_index in reversed(bm_changes['remove']):
+            del self.board_state['black_market'][removed_index]
 
         for entity in self.get_current_entities().values():
             if action := self.player_inputs.get(entity['id'] + '__action'):
@@ -473,6 +503,17 @@ class Game(db.Model):
                 gc['count'] = 0
             gc['vitality'] = ros['vitality']
 
+    def generate_bm_pool(self):
+        pool = list()
+        for k, v in Asset.assets.items():
+            pool.extend([k] * v[-1])
+        self.board_state['black_market_pool'] = pool
+
+    def get_new_bm_asset(self):
+        new_asset = choice(self.board_state['black_market_pool'])
+        self.board_state['black_market_pool'].remove(new_asset)
+        self.board_state['black_market'].append((new_asset, 0))
+
     def calculate_victory_points(self):
         turn = self.board_state['turn']
         teams = self.board_state['teams']
@@ -504,6 +545,7 @@ class Game(db.Model):
                 self.calculate_victory_points()
             else:
                 self.process_event()
+                self.get_new_bm_asset()
 
         self.ready_players.clear()
         self.player_inputs.clear()

@@ -302,7 +302,7 @@ svg.attack-arrow line {
     z-index: 1000;
 }
 
-#assets {
+#assets, #black-market {
     margin-top: 5%;
     height: 60%;
     width: 60%;
@@ -312,16 +312,20 @@ svg.attack-arrow line {
     z-index: 10000;
 }
 
-.asset-container {
+.asset-container, .bm-container {
     display: flex;
     gap: 10px;
     flex-wrap: wrap;
 }
 
-#close-assets {
+#close-assets, #submit-bm, #clear-bm {
     position: absolute;
     bottom: 15px;
     flex: 1;
+}
+
+#clear-bm {
+    left: 80px;
 }
 
 .asset {
@@ -336,6 +340,24 @@ svg.attack-arrow line {
     flex-direction: column;
 }
 
+.bidding {
+    display: flex;
+    flex: 1;
+    background: revert !important;
+}
+
+.bidding > label {
+    padding-right: 10px;
+}
+
+.bidding > input {
+    width: 50%;
+}
+
+.bm-bid {
+    flex: 1;
+}
+
 .asset > div {
     flex: 1;
     background: var(--light-background);
@@ -344,6 +366,7 @@ svg.attack-arrow line {
 .asset > div:nth-child(even) {
     background: var(--dark-background);
 }
+
 .activated-asset {
     color: darkgray;
 }

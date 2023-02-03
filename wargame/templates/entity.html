@@ -49,18 +49,18 @@
         {% for target in entity.connections %}
         <div class="transfer {{ entity.id }}__transfer action-hide" target="{{ target }}">
             Transfer to {{ display_name(target) }}:
-            <input class="{{ entity.id }}__transfer-input" type="number" data-value=0 placeholder=0 min=0 max={{ [entity.resource, 5] | min }} name="{{ entity.id }}-{{ target }}__transfer" autocomplete="off"></input>
+            <input class="{{ entity.id }}__transfer-input" type="number" data-value=0 placeholder=0 min=0 max={{ [entity.resource, 5] | min }} name="{{ entity.id }}-{{ target }}__transfer" autocomplete="off">
         </div>
         {% endfor %}
         {% for target in entity.attacks %}
         <div class="attack {{ entity.id }}__attack action-hide" target="{{ target }}">
             Attack {{ display_name(target) }}:
-            <input type="number" placeholder=0 min=0 max={{ [entity.resource, 6] | min }} name="{{ entity.id }}-{{ target }}__attack" autocomplete="off"></input>
+            <input type="number" placeholder=0 min=0 max={{ [entity.resource, 6] | min }} name="{{ entity.id }}-{{ target }}__attack" autocomplete="off">
         </div>
         {% endfor %}
         <div class="{{ entity.id }}__revitalize action-hide">
             Amount of vitality to recover. Cost: <span class="vitality-cost">0</span>
-            <input type="number" placeholder=0 min=0 max={{ [calculate_max_revitalization(entity.resource), 6] | min }} class="revitalize-amount" name="{{ entity.id }}__revitalize" autocomplete="off"></input>
+            <input type="number" placeholder=0 min=0 max={{ [calculate_max_revitalization(entity.resource), 6] | min }} class="revitalize-amount" name="{{ entity.id }}__revitalize" autocomplete="off">
         </div>
     </fieldset>
 </div>

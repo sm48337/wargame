@@ -2,7 +2,7 @@
 <dialog id="assets">
     <div class="asset-container">
         <input type="hidden" id="activated-assets" name="activated-assets" autocomplete="off">
-        {% for asset_name, asset_type, asset_effect, asset_options in get_assets(assets) %}
+        {% for asset_name, asset_type, asset_effect, asset_options, _, _ in get_assets(assets) %}
         <div class="asset">
             <div class="asset-name">{{ asset_name }}</div>
             <div class="asset-type">Type: {{ asset_type }}</div>

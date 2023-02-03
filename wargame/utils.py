@@ -215,17 +215,17 @@ class Asset:
 
     assets = {
         "attack_vector":    ('Attack Vector', 'attack', "Opens up one of the following attack vectors: GCHQ - Rosenergoatom, SCS - UK Energy, UK Government - Russia Government.",
-                             ('gchq', 'scs', 'uk_gov')),
-        "education":        ('Education', 'defensive', "Electorate suffers only half of any damage it receives for the next 3 turns.", ()),
-        "recovery":         ('Recovery Management', 'defensive', "At the end of a turn, if UK PLC has sufferred any damage, they receive +1 vitality.", ()),
-        "software_update":  ('Software Update', 'defensive', "Renders UK PLC or UK Energy or Rosenergoatom immune to direct attack for 2 turns.", ('plc', 'energy', 'ros')),
-        "bargaining_chip":  ('Bargaining Chip', 'defensive', "Russia Government suffers only half of any damage it receives for the next 3 turns.", ()),
+                             ('gchq', 'scs', 'uk_gov'), 5, 2),
+        "education":        ('Education', 'defensive', "Electorate suffers only half of any damage it receives for the next 3 turns.", (), 3, 1),
+        "recovery":         ('Recovery Management', 'defensive', "At the end of a turn, if UK PLC has sufferred any damage, they receive +1 vitality.", (), 4, 1),
+        "software_update":  ('Software Update', 'defensive', "Renders UK PLC or UK Energy or Rosenergoatom immune to direct attack for 2 turns.", ('plc', 'energy', 'ros'), 2, 2),
+        "bargaining_chip":  ('Bargaining Chip', 'defensive', "Russia Government suffers only half of any damage it receives for the next 3 turns.", (), 3, 1),
         "network_policy":   ('Network Policy', 'defensive', "Renders entity immune from splash damage, but only 2 resource can be transferred to or from it each turn.",
-                             (entity_id_to_name_map.keys())),
-        "stuxnet":          ('Stuxnet 2.0', 'attack', "Direct attack from GCHQ/SCS deals double damage to UK Energy or Rosenergoatom.", ('gchq', 'scs')),
+                             (entity_id_to_name_map.keys()), 2, 2),
+        "stuxnet":          ('Stuxnet 2.0', 'attack', "Direct attack from GCHQ/SCS deals double damage to UK Energy or Rosenergoatom.", ('gchq', 'scs'), 4, 2),
         "ransomware":       ('Ransomware', 'attack', "When part of successful direct attack, paralyses UK PLC or Electorate for 2 turns unless 2 resource is paid to attacker.",
-                             ('plc', 'elect')),
-        "cyber_investment": ('Cyber Investment Programme', 'defensive', "Entity may regenerate vitality at 1 less resource cost than normal.", (entity_id_to_name_map.keys())),
+                             ('plc', 'elect'), 3, 2),
+        "cyber_investment": ('Cyber Investment Programme', 'defensive', "Entity may regenerate vitality at 1 less resource cost than normal.", (entity_id_to_name_map.keys()), 3, 2),
     }
 
     def __init__(self, board_state):
@@ -319,6 +319,12 @@ def is_entity_active(game, controller, current_user, team):
     ])
 
 
+def get_bm_assets(assets):
+    for asset, bid in assets:
+        asset_name, asset_type, asset_effect, _, min_bid, _ = Asset.assets[asset]
+        yield asset_name, asset_type, asset_effect, min_bid, bid
+
+
 def helper_functions():
     return dict(
         turn_to_month=turn_to_month,
@@ -333,6 +339,7 @@ def helper_functions():
         entity_ids_by_team=entity_ids_by_team,
         entity_controller=entity_controller,
         get_assets=Asset.get_assets,
+        get_bm_assets=get_bm_assets,
         get_player_team=get_player_team,
         get_timer_string=get_timer_string,
         is_entity_active=is_entity_active,

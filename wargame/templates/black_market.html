@@ -1,5 +1,23 @@
 <dialog id="black-market">
-    <input type="hidden" id="activated-bm" name="activated-bm" autocomplete="off">
-    <button id="cancel-bm">Cancel</button>
-    <button id="confirm-bm">Confirm</button>
+    <div class="bm-container">
+        <input type="hidden" id="activated-bm" name="activated-bm" autocomplete="off">
+        {% for asset_name, asset_type, asset_effect, min_bid, bid in get_bm_assets(bm_items) %}
+        <div class="asset">
+            {% set minimum_bid = [min_bid, bid + 1] | max %}
+            <div class="asset-name">{{ asset_name }}</div>
+            <div class="asset-type">Type: {{ asset_type }}</div>
+            <div class="asset-effect">{{ asset_effect }}</div>
+            <div class="asset-min-bid">Minimum bid: {{ minimum_bid }}</div>
+            <div class="opponent-bid">Opponent bid: {{ bid }}</div>
+            {% set bid_id = 'bm-bid-' ~ loop.index0 %}
+            <div class="bidding">
+                <label for="{{ bid_id }}">Bid amount:</label>
+                <input type="number" placeholder=0 min={{ minimum_bid }} max={{ ns.black_market_resources }} autocomplete="off"
+                    id="{{ bid_id }}" class="bm-bid" name="{{ bid_id }}" data-value=0 data-index={{ loop.index0 }}>
+            </div>
+        </div>
+        {% endfor %}
+        <button id="clear-bm">Clear</button>
+        <button id="submit-bm">Submit</button>
+    </div>
 </dialog>

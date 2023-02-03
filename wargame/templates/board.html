@@ -64,6 +64,9 @@
             {% for entity in context.board_state.teams[team].entities.values() %}
             {% set controller = entity_controller(context[team + '_team'], entity.id) %}
             {% set active = is_entity_active(context, controller, current_user, team) %}
+            {% if active and entity.id in ['scs', 'gchq'] %}
+            {% set ns.black_market_resources = entity.resource %}
+            {% endif %}
             {% if active %}
                 {% set ns.has_actions = True %}
             {% endif %}
@@ -86,7 +89,11 @@
     {% with assets = context.board_state.teams[current_team(context.board_state['turn'])]['assets'] %}
     {% include 'assets.html' %}
     {% endwith %}
+    {% if ns.black_market_resources %}
+    {% with bm_items = context.board_state.black_market %}
     {% include 'black_market.html' %}
+    {% endwith %}
+    {% endif %}
     <input type="submit" value="Finish turn" class="finish-turn-btn">
     {% endif %}
 </form>

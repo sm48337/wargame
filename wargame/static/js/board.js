@@ -33,7 +33,7 @@ const makeOnlySelectedOptionVisible = () => {
 
     radio.addEventListener('change', () => {
       allHiddenInputs.forEach(input => input.classList.add('action-hide'));
-      if (controlledInputs) controlledInputs.forEach(input => input.classList.remove('action-hide'));
+      controlledInputs?.forEach(input => input.classList.remove('action-hide'));
     });
   });
 };
@@ -172,23 +172,41 @@ const handleBlackMarket = () => {
   const scsOpen = document.getElementById('scs__black_market');
   const gchqOpen = document.getElementById('gchq__black_market');
   const marketDialog = document.getElementById('black-market');
-  const cancelDialog = document.getElementById('cancel-bm');
-  const confirmDialog = document.getElementById('confirm-bm');
+  const clearButton = document.getElementById('clear-bm');
+  const submitDialog = document.getElementById('submit-bm');
 
-  if (!cancelDialog) return;
+  if (!submitDialog) return;
   const openFunction = () => {
     marketDialog.showModal();
   };
-  if (scsOpen) scsOpen.addEventListener('change', openFunction);
-  if (gchqOpen) gchqOpen.addEventListener('change', openFunction);
-  cancelDialog.addEventListener('click', e => {
+  marketDialog?.addEventListener('close', () => {
+    scsOpen?.parentNode.parentNode.parentNode.parentNode.classList.remove('active');
+    gchqOpen?.parentNode.parentNode.parentNode.parentNode.classList.remove('active');
+  });
+  scsOpen?.addEventListener('change', openFunction);
+  gchqOpen?.addEventListener('change', openFunction);
+  submitDialog.addEventListener('click', e => {
     marketDialog.close();
     e.preventDefault();
   });
-  confirmDialog.addEventListener('click', e => {
-    marketDialog.close();
-    scsOpen.parentNode.parentNode.parentNode.classList.remove('active');
-    gchqOpen.parentNode.parentNode.parentNode.classList.remove('active');
+
+  const bidInputs = Array.from(document.querySelectorAll('.bm-bid'));
+  const startingResources = bidInputs ? bidInputs[0].max : 0;
+  bidInputs.forEach(input => {
+    input.addEventListener('change', e => {
+      const amountChanged = e.target.value - e.target.dataset.value;
+      e.target.dataset.value = e.target.value;
+      bidInputs.filter(i => i !== input).forEach(otherInput => {
+        otherInput.max -= amountChanged;
+      });
+    });
+  })
+  clearButton.addEventListener('click', e => {
+    bidInputs.forEach(input => {
+      input.value = '';
+      input.max = startingResources;
+      input.dataset.value = 0;
+    });
     e.preventDefault();
   });
 };
