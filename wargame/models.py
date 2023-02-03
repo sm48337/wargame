@@ -194,7 +194,7 @@ class Game(db.Model):
         return validation_errors
 
     def _do_revitalize(self, entity):
-        vitality_recovered = int(self.player_inputs.get(entity['id'] + '__revitalize'))
+        vitality_recovered = int(self.player_inputs.get(entity['id'] + '__revitalize') or 0)
         recovery_cost = vitality_recovery_cost[vitality_recovered]
         entity['vitality'] += vitality_recovered
         entity['resource'] -= recovery_cost
