@@ -264,6 +264,16 @@ const handlePauseButton = () => {
   });
 };
 
+const handleEndScreen = () => {
+  const endDialog = document.getElementById('game-end');
+  const endButton = document.getElementById('close-end-screen');
+  endDialog?.showModal();
+  endButton?.addEventListener('click', e => {
+    endDialog.close();
+    e.preventDefault();
+  });
+};
+
 window.onload = () => {
   setTitle();
   scrollDown();
@@ -277,6 +287,8 @@ window.onload = () => {
     if (window.isOwner) {
       handlePauseButton();
     }
+  } else {
+    handleEndScreen();
   }
   handleAssetsDialog();
   handleBlackMarket();

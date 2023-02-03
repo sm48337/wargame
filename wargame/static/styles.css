@@ -413,6 +413,12 @@ svg.attack-arrow line {
     padding-inline: 10px;
 }
 
+#close-end-screen {
+    position: absolute;
+    left: 50%;
+    transform: translate(-50%, -50%);
+}
+
 .navbar * {
     position: relative;
     z-index: 1000;

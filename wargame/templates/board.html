@@ -48,7 +48,9 @@
     {% if current_user == context.owner and not context.victor %}
     <button id="toggle-pause-button">{{ '▶' if context.is_paused else '⏸ ' }}</button>
     {% endif %}
-    {% if not context.victor %}
+    {% if context.victor %}
+    {% include 'end_screen.html' %}
+    {% else %}
     <div id="round-timer" class="time-green">{{ get_timer_string(context) }}</div>
     {% endif %}
     <div class="game-info">
