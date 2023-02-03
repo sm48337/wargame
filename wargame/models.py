@@ -536,6 +536,7 @@ class Game(db.Model):
         self.process_inputs()
         game_over = self.check_health()
         self.progress_time(game_over)
+        self.board_state['teams']['blue']['assets'].append('attack_vector')
 
         if not self.victor:
             self.give_resources()

@@ -239,11 +239,11 @@ class Asset:
             yield cls.assets[asset_id]
 
     def attack_vector(self, option):
-        if option == 0:
+        if option == 'gchq':
             self.blue_team['gchq']['attacks'] = ['ros']
-        elif option == 1:
+        elif option == 'scs':
             self.red_team['scs']['attacks'] = ['energy']
-        elif option == 2:
+        elif option == 'uk_gov':
             self.blue_team['uk_gov']['attacks'] = ['rus_gov']
 
     def education(self, _):
