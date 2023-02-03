@@ -216,6 +216,7 @@ class Game(db.Model):
 
         if fatalities:
             self.determine_winner()
+        return fatalities
 
     def _do_damage(self, target_id, amount, target_team):
         connections, target = self.get_all_connections(target_id, target_team)
@@ -405,9 +406,10 @@ class Game(db.Model):
         gov_entity['resource'] += 3
         self.log(f"Turn starts - {gov_entity['name']} gains 3 resources.", 'turn')
 
-    def progress_time(self):
+    def progress_time(self, game_over):
         turn = self.board_state['turn']
-        self.log(f'End of turn {turn // 2 + 1} for the {current_team(turn).capitalize()} team.', 'turn')
+        if not game_over:
+            self.log(f'End of turn {turn // 2 + 1} for the {current_team(turn).capitalize()} team.', 'turn')
         self.board_state['turn'] += 1
         self.unpause_time = datetime.now()
         self.seconds_left = int(self.round_length.total_seconds())
@@ -532,10 +534,10 @@ class Game(db.Model):
             return
 
         self.process_inputs()
-        self.check_health()
+        game_over = self.check_health()
+        self.progress_time(game_over)
 
         if not self.victor:
-            self.progress_time()
             self.give_resources()
 
             turn = self.board_state['turn']
