@@ -62,3 +62,6 @@ def get_or_create_secret_key(path):
         with open(path, 'rb') as f:
             secret_key = f.read()
     return secret_key
+
+
+app = create_app()
