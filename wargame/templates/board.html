@@ -91,7 +91,7 @@
     {% with assets = context.board_state.teams[current_team(context.board_state['turn'])]['assets'] %}
     {% include 'assets.html' %}
     {% endwith %}
-    {% if ns.black_market_resources %}
+    {% if ns.black_market_resources is not none %}
     {% with bm_items = context.board_state.black_market %}
     {% include 'black_market.html' %}
     {% endwith %}

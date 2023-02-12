@@ -320,9 +320,11 @@ def is_entity_active(game, controller, current_user, team):
 
 
 def get_bm_assets(assets):
-    for asset, bid in assets:
-        asset_name, asset_type, asset_effect, _, min_bid, _ = Asset.assets[asset]
-        yield asset_name, asset_type, asset_effect, min_bid, bid
+    for asset, opposing_bid, old_bid in assets:
+        asset_name, asset_type, asset_effect, _, required_bid, _ = Asset.assets[asset]
+        if opposing_bid:
+            required_bid = opposing_bid - old_bid + 1
+        yield asset_name, asset_type, asset_effect, required_bid, opposing_bid
 
 
 def get_popup_messages(message_log):

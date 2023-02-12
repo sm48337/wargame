@@ -1,22 +1,21 @@
 <dialog id="black-market">
     <div class="bm-container">
         <input type="hidden" id="activated-bm" name="activated-bm" autocomplete="off">
-        {% for asset_name, asset_type, asset_effect, min_bid, bid in get_bm_assets(bm_items) %}
+        {% for asset_name, asset_type, asset_effect, required_bid, opposing_bid in get_bm_assets(bm_items) %}
         <div class="asset">
-            {% set minimum_bid = [min_bid, bid + 1] | max %}
             <div class="asset-name">{{ asset_name }}</div>
             <div class="asset-type">Type: {{ asset_type }}</div>
             <div class="asset-effect">{{ asset_effect }}</div>
-            <div class="asset-min-bid">Minimum bid: {{ minimum_bid }}</div>
-            {% if bid %}
-            <div class="opponent-bid has-bid">Opponent bid: {{ bid }}</div>
+            <div class="asset-min-bid">Required bid: {{ required_bid }}</div>
+            {% if opposing_bid %}
+            <div class="opponent-bid has-bid">Opponent bid: {{ opposing_bid }}</div>
             {% else %}
             <div class="opponent-bid">Opponent bid: -</div>
             {% endif %}
             {% set bid_id = 'bm-bid-' ~ loop.index0 %}
             <div class="bidding">
                 <label for="{{ bid_id }}">Bid amount:</label>
-                <input type="number" placeholder=0 min={{ minimum_bid }} max={{ ns.black_market_resources }} autocomplete="off"
+                <input type="number" placeholder=0 min={{ required_bid }} max={{ ns.black_market_resources }} autocomplete="off"
                     id="{{ bid_id }}" class="bm-bid" name="{{ bid_id }}" data-value=0 data-index={{ loop.index0 }}>
             </div>
         </div>

@@ -323,32 +323,24 @@ class Game(db.Model):
             for index in used_assets:
                 del team['assets'][index]
 
-        bm_changes = {
-            'remove': [],
-            'bid': [],
-        }
+        bm_removal = list()
         for index, bm_item in enumerate(self.board_state['black_market']):
-            asset, old_bid = bm_item
+            asset, opposing_bid, old_bid = bm_item
             bid = int(self.player_inputs.get(f'bm-bid-{index}') or 0)
             if current_team(turn) == 'red':
                 team['entities']['scs']['resource'] -= bid
             else:
                 team['entities']['gchq']['resource'] -= bid
             asset_name = Asset.assets[asset][0]
-            if old_bid and not bid:
+            if opposing_bid and not bid:
                 self.log(f"Team {opposing_team(turn).capitalize()}'s bid for {asset_name} was not contested - asset gained.", 'action')
                 self.board_state['teams'][opposing_team(turn)]['assets'].append(asset)
-                bm_changes['remove'].append(index)
+                bm_removal.append(index)
             elif bid:
                 self.log(f'Team {current_team(turn).capitalize()} bid {bid} for {asset_name}.', 'action')
-                self.board_state['black_market'][index] = asset, bid
-                bm_changes['bid'].append((index, bid))
+                self.board_state['black_market'][index] = asset, bid + old_bid, opposing_bid
 
-        for index, bid in bm_changes['bid']:
-            asset = self.board_state['black_market'][index][0]
-            self.board_state['black_market'][index] = asset, bid
-
-        for removed_index in reversed(bm_changes['remove']):
+        for removed_index in reversed(bm_removal):
             del self.board_state['black_market'][removed_index]
 
         for entity in self.get_current_entities().values():
@@ -518,7 +510,7 @@ class Game(db.Model):
     def get_new_bm_asset(self):
         new_asset = choice(self.board_state['black_market_pool'])
         self.board_state['black_market_pool'].remove(new_asset)
-        self.board_state['black_market'].append((new_asset, 0))
+        self.board_state['black_market'].append((new_asset, 0, 0))
 
     def calculate_victory_points(self):
         turn = self.board_state['turn']
