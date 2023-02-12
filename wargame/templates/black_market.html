@@ -8,7 +8,11 @@
             <div class="asset-type">Type: {{ asset_type }}</div>
             <div class="asset-effect">{{ asset_effect }}</div>
             <div class="asset-min-bid">Minimum bid: {{ minimum_bid }}</div>
-            <div class="opponent-bid">Opponent bid: {{ bid }}</div>
+            {% if bid %}
+            <div class="opponent-bid has-bid">Opponent bid: {{ bid }}</div>
+            {% else %}
+            <div class="opponent-bid">Opponent bid: -</div>
+            {% endif %}
             {% set bid_id = 'bm-bid-' ~ loop.index0 %}
             <div class="bidding">
                 <label for="{{ bid_id }}">Bid amount:</label>

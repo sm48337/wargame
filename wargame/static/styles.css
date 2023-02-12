@@ -374,6 +374,11 @@ svg.attack-arrow line {
     flex-direction: column;
 }
 
+.has-bid {
+    color: firebrick;
+    font-weight: 600;
+}
+
 .bidding {
     display: flex;
     flex: 1;
