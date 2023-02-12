@@ -560,6 +560,11 @@ ul.flashes {
     font-weight: 500;
 }
 
+#message-log .attack-damage {
+    color: firebrick;
+    font-weight: 500;
+}
+
 #message-log .event {
     color: midnightblue;
 }

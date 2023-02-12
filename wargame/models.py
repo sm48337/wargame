@@ -240,7 +240,7 @@ class Game(db.Model):
                 pass
             else:
                 connection['vitality'] -= amount // 2
-        self.log(f"{target['name']} was dealt {amount} damage. Connected entities got {amount // 2} damage.", 'action')
+        self.log(f"{target['name']} was dealt {amount} damage. Connected entities got {amount // 2} damage.", 'attack-damage')
 
     def _do_attribution(self, attacker, level):
         if attacker == 'bear':
