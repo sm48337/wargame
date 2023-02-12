@@ -336,7 +336,7 @@ svg.attack-arrow line {
     z-index: 1000;
 }
 
-#assets, #black-market {
+#assets, #black-market, #popup {
     margin-top: 5%;
     height: 60%;
     width: 60%;
@@ -346,13 +346,13 @@ svg.attack-arrow line {
     z-index: 10000;
 }
 
-.asset-container, .bm-container {
+.asset-container, .bm-container, .popup-container {
     display: flex;
     gap: 10px;
     flex-wrap: wrap;
 }
 
-#close-assets, #submit-bm, #clear-bm {
+#close-assets, #submit-bm, #clear-bm, #close-popup {
     position: absolute;
     bottom: 15px;
     flex: 1;
@@ -541,11 +541,14 @@ ul.flashes {
     overflow: scroll;
 }
 
+#popup ul,
 #message-log ul {
     list-style: none;
     padding: 0;
+    margin: auto;
 }
 
+#popup li,
 #message-log li {
     border-bottom: 2px solid gray;
     font-size: 0.9rem;

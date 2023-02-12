@@ -404,7 +404,7 @@ class Game(db.Model):
             return
         gov_entity = entities.get('rus_gov') or entities.get('uk_gov')
         gov_entity['resource'] += 3
-        self.log(f"Turn starts - {gov_entity['name']} gains 3 resources.", 'turn')
+        self.log(f"Turn starts - {gov_entity['name']} gains 3 resources.", 'resource')
 
     def progress_time(self, game_over):
         turn = self.board_state['turn']

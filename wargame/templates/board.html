@@ -99,4 +99,9 @@
     <input type="submit" value="Finish turn" class="finish-turn-btn">
     {% endif %}
 </form>
+    {% with popup_messages = get_popup_messages(context.message_log) | list %}
+    {% if popup_messages %}
+    {% include "popup.html" %}
+    {% endif %}
+    {% endwith %}
 {% endblock %}

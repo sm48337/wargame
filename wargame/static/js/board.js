@@ -274,6 +274,16 @@ const handleEndScreen = () => {
   });
 };
 
+const showPopup = () => {
+  const popupDialog = document.getElementById('popup');
+  const closeButton = document.getElementById('close-popup');
+  popupDialog?.showModal();
+  closeButton?.addEventListener('click', e => {
+    popupDialog.close();
+    e.preventDefault();
+  });
+};
+
 window.onload = () => {
   setTitle();
   scrollDown();
@@ -293,6 +303,7 @@ window.onload = () => {
   handleAssetsDialog();
   handleBlackMarket();
   positionArrows();
+  showPopup();
 };
 
 window.onresize = () => {

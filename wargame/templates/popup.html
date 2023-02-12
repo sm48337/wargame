@@ -1,0 +1,15 @@
+<dialog id="popup">
+    <h3>Damage report</h3>
+    <div class="popup-container">
+        {% for message in popup_messages %}
+        {% if loop.first %}
+        <ul>
+        {% endif %}
+            <li>{{ message }}</li>
+        {% if loop.last %}
+        </ul>
+        {% endif %}
+        {% endfor %}
+    </div>
+    <button id="close-popup">Close</button>
+</dialog>

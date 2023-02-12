@@ -325,6 +325,17 @@ def get_bm_assets(assets):
         yield asset_name, asset_type, asset_effect, min_bid, bid
 
 
+def get_popup_messages(message_log):
+    last_turn = False
+    for message, category in reversed(message_log):
+        if category == 'turn':
+            if last_turn:
+                return
+            last_turn = True
+        if category == 'attack-damage' and last_turn:
+            yield message
+
+
 def helper_functions():
     return dict(
         turn_to_month=turn_to_month,
@@ -343,4 +354,5 @@ def helper_functions():
         get_player_team=get_player_team,
         get_timer_string=get_timer_string,
         is_entity_active=is_entity_active,
+        get_popup_messages=get_popup_messages,
     )
