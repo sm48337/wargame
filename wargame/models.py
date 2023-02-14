@@ -54,7 +54,7 @@ class User(db.Model, UserMixin):
         return Game.query.join(
             Team, or_(Team.id == Game.red_team_id,
                       Team.id == Game.blue_team_id)
-        ).where(self._all_roles_query()).all()
+        ).where(or_(self._all_roles_query(), Game.owner == self)).all()
 
 
 class Team(db.Model):
