@@ -31,4 +31,4 @@ The turns are timed and automatically finish after 3 minutes are up.
 
 The goal of the game is to end the game with more Victory Points than the opponent by achieving goals such as attacking opponent's entities and by defending yourself while building up wealth.
 
-The exact goals and many other rule explanations are available in Appendices A and B [this paper](2019haggmanaphd.pdf).
+The exact goals and many other rule explanations are available in Appendices A and B of [this paper](2019haggmanaphd.pdf).
