@@ -527,11 +527,7 @@ class Game(db.Model):
 
         self.process_inputs()
         game_over = self.check_health()
-        self.progress_time(game_over)
-
         if not self.victor:
-            self.give_resources()
-
             turn = self.board_state['turn']
             if turn == end_of_month(1):
                 self.enable_attacks()
@@ -539,11 +535,15 @@ class Game(db.Model):
                 self.determine_winner()
 
             # end of month
-            if turn % 2 == 1:
+            if turn % 2 == 0:
                 self.calculate_victory_points()
             else:
                 self.process_event()
                 self.get_new_bm_asset()
+
+        self.progress_time(game_over)
+
+        self.give_resources()
 
         self.ready_players.clear()
         self.player_inputs.clear()
